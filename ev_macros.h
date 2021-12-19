@@ -1,5 +1,46 @@
 #pragma once
 
+#include "defines.h"
+
+/*!
+ * \brief Macro to get a type's alignment
+ */
+#define EV_ALIGNOF _Alignof
+
+/*!
+ * \brief Attribute to specify the minimum alignment of a variable or structure
+ */
+#define EV_ALIGNAS _Alignas
+
+/*!
+ * \brief A simple decorator with no purpose other than to make it known that
+ * a function parameter is not guaranteed to be aligned.
+ */
+#define EV_UNALIGNED
+
+#if defined(EV_CC_MSVC)
+# define EV_EXPORT __declspec(dllexport)
+# define EV_IMPORT __declspec(dllimport)
+# define EV_UNUSED
+#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+# define EV_EXPORT __attribute__((visibility("default")))
+# define EV_IMPORT
+# define EV_UNUSED __attribute__((unused))
+#else
+# error "Unknown Compiler"
+#endif
+
+#if defined(EV_CC_MSVC)
+# define _EV_BREAK_IF(cond) cond ? __debugbreak():0
+#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+# include <signal.h>
+# define _EV_BREAK_IF(cond) cond ? raise(SIGTRAP):0
+#else
+# error "Unknown Compiler"
+#endif
+
+#define EV_ARRSIZE(...) sizeof(__VA_ARGS__)/sizeof((__VA_ARGS__)[0])
+
 // Concatenation of two tokens
 #define EV_CAT_IMPL(a, ...) a##__VA_ARGS__
 #define EV_CAT(a, ...) EV_CAT_IMPL(a, __VA_ARGS__)
