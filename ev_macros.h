@@ -1,12 +1,64 @@
 #pragma once
 
-// Concatenation of two tokens
-#define EV_CAT_IMPL(a, ...) a##__VA_ARGS__
-#define EV_CAT(a, ...) EV_CAT_IMPL(a, __VA_ARGS__)
+#include "defines.h"
 
-// Stringizing a token
-#define EV_STRINGIZE_IMPL(a) #a
-#define EV_STRINGIZE(a) EV_STRINGIZE_IMPL(a)
+/*!
+ * \brief Macro to get a type's alignment
+ */
+#define EV_ALIGNOF _Alignof
+
+/*!
+ * \brief Attribute to specify the minimum alignment of a variable or structure
+ */
+#define EV_ALIGNAS _Alignas
+
+/*!
+ * \brief A simple decorator with no purpose other than to make it known that
+ * a function parameter is not guaranteed to be aligned.
+ */
+#define EV_UNALIGNED
+
+#if defined(EV_CC_MSVC)
+# define EV_EXPORT __declspec(dllexport)
+# define EV_IMPORT __declspec(dllimport)
+# define EV_UNUSED
+#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+# define EV_EXPORT __attribute__((visibility("default")))
+# define EV_IMPORT
+# define EV_UNUSED __attribute__((unused))
+#else
+# error "Unknown Compiler"
+#endif
+
+#if defined(EV_CC_MSVC)
+# define _EV_BREAK_IF(cond) cond ? __debugbreak():0
+#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+# include <signal.h>
+# define _EV_BREAK_IF(cond) cond ? raise(SIGTRAP):0
+#else
+# error "Unknown Compiler"
+/*!
+ * \brief Breaks in the debugger if `cond` evaluates to `true`
+ */
+# define _EV_BREAK_IF(cond)
+#endif
+
+/*!
+ * \brief Macro to get the size of a compile-time array.
+ */
+#define EV_ARRSIZE(...) (sizeof(__VA_ARGS__)/sizeof((__VA_ARGS__)[0]))
+
+/*!
+ * \brief Macro to concatenate two tokens together.
+ */
+#define EV_CAT(a, ...) EV_CAT_IMPL(a, __VA_ARGS__)
+#define EV_CAT_IMPL(a, ...) a##__VA_ARGS__
+
+/*!
+ * \brief Macro to wrap tokens in double quotations. (")
+ */
+#define EV_STRINGIZE(...) EV_STRINGIZE_IMPL(__VA_ARGS__)
+#define EV_STRINGIZE_IMPL(...) #__VA_ARGS__
 
 // Used for the removal of parenthesis around tokens
 #define EV_EXPAND(...) __VA_ARGS__
@@ -15,13 +67,19 @@
 #define EV_DEFER(id) id EV_EMPTY()
 #define EV_OBSTRUCT(...) __VA_ARGS__ EV_DEFER(EV_EMPTY)()
 
-// Get number of arguments
+/*!
+ * \brief Macro that returns the number of arguments passed to it.
+ */
 #define EV_VA_ARGS_NARG(...) EV_VA_ARGS_NARG_IMPL(__VA_ARGS__, EV_VA_ARGS_RSEQ_N())
 #define EV_VA_ARGS_NARG_IMPL(...) EV_VA_ARGS_ARG_N(__VA_ARGS__)
 #define EV_VA_ARGS_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, _64, N, ...) N
 #define EV_VA_ARGS_RSEQ_N() 64, 63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 
-// A 64-element long for loop
+/*!
+ * \brief Calls the passed macro for each element.
+ * \note Maximum number of elements to iterate over is 64 elements.
+ */
+#define EV_FOREACH(OP, ...) EV_CAT(__EV_INTERNAL_FOREACH, EV_VA_ARGS_NARG(__VA_ARGS__))(OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH1( OP, a     ) OP(a)
 #define __EV_INTERNAL_FOREACH2( OP, a, ...) OP(a) __EV_INTERNAL_FOREACH1( OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH3( OP, a, ...) OP(a) __EV_INTERNAL_FOREACH2( OP, __VA_ARGS__)
@@ -86,4 +144,3 @@
 #define __EV_INTERNAL_FOREACH62(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH61(OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH63(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH62(OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH64(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH63(OP, __VA_ARGS__)
-#define EV_FOREACH(OP, ...) EV_CAT(__EV_INTERNAL_FOREACH, EV_VA_ARGS_NARG(__VA_ARGS__))(OP, __VA_ARGS__)
