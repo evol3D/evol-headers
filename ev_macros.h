@@ -57,8 +57,8 @@
 /*!
  * \brief Macro to wrap tokens in double quotations. (")
  */
-#define EV_STRINGIZE(a) EV_STRINGIZE_IMPL(a)
-#define EV_STRINGIZE_IMPL(a) #a
+#define EV_STRINGIZE(...) EV_STRINGIZE_IMPL(__VA_ARGS__)
+#define EV_STRINGIZE_IMPL(...) #__VA_ARGS__
 
 // Used for the removal of parenthesis around tokens
 #define EV_EXPAND(...) __VA_ARGS__
