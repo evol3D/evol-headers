@@ -44,6 +44,12 @@
 # define _EV_BREAK_IF(cond)
 #endif
 
+#if ( EV_BUILDTYPE_DEBUG || EV_BUILDTYPE_DEBUGOPT )
+# define EV_DBGBREAK_IF(...) _EV_BREAK_IF(__VA_ARGS__)
+#else
+# define EV_DBGBREAK_IF(...)
+#endif
+
 /*!
  * \brief Macro to get the size of a compile-time array.
  */
