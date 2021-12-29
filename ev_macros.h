@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EV_HEADERS_MACROS_H
+#define EV_HEADERS_MACROS_H
 
 #include "defines.h"
 
@@ -18,11 +19,11 @@
  */
 #define EV_UNALIGNED
 
-#if defined(EV_CC_MSVC)
+#if ( EV_CC_MSVC )
 # define EV_EXPORT __declspec(dllexport)
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
-#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+#elif ( EV_CC_GCC || EV_CC_CLANG )
 # define EV_EXPORT __attribute__((visibility("default")))
 # define EV_IMPORT
 # define EV_UNUSED __attribute__((unused))
@@ -30,9 +31,9 @@
 # error "Unknown Compiler"
 #endif
 
-#if defined(EV_CC_MSVC)
+#if ( EV_CC_MSVC )
 # define _EV_BREAK_IF(cond) cond ? __debugbreak():0
-#elif defined(EV_CC_GCC) || defined(EV_CC_CLANG)
+#elif ( EV_CC_GCC || EV_CC_CLANG )
 # include <signal.h>
 # define _EV_BREAK_IF(cond) cond ? raise(SIGTRAP):0
 #else
@@ -144,3 +145,5 @@
 #define __EV_INTERNAL_FOREACH62(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH61(OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH63(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH62(OP, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH64(OP, a, ...) OP(a) __EV_INTERNAL_FOREACH63(OP, __VA_ARGS__)
+
+#endif // EV_HEADERS_MACROS_H
