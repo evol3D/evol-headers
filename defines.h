@@ -78,4 +78,23 @@
 # endif
 #endif
 
+#ifndef EV_BUILDTYPE_DEBUG
+# define EV_BUILDTYPE_DEBUG 0
+#endif
+#ifndef EV_BUILDTYPE_DEBUGOPT
+# define EV_BUILDTYPE_DEBUGOPT 0
+#endif
+#ifndef EV_BUILDTYPE_RELEASE
+# define EV_BUILDTYPE_RELEASE 0
+#endif
+#if (EV_BUILDTYPE_DEBUG || EV_BUILDTYPE_DEBUGOPT || EV_BUILDTYPE_RELEASE)
+# define EV_BUILDTYPE_DEFINED 1
+#else
+# define EV_BUILDTYPE_DEFINED 0
+#endif
+
+#if !EV_BUILDTYPE_DEFINED
+# error "Buildtype not defined. Please define one of `EV_BUILDTYPE_{DEBUG,DEBUGOPT,RELEASE}`"
+#endif
+
 #endif // EV_HEADERS_DEFINES_H
