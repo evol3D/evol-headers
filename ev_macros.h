@@ -67,6 +67,16 @@
 #define EV_STRINGIZE(...) EV_STRINGIZE_IMPL(__VA_ARGS__)
 #define EV_STRINGIZE_IMPL(...) #__VA_ARGS__
 
+/*!
+ * \brief Returns head of list (a,b,c) -> a
+ */
+#define EV_HEAD(h,...) h
+
+/*!
+ * \brief Returns tail of list (a,b,c) -> b,c
+ */
+#define EV_TAIL(h,...) __VA_ARGS__
+
 // Used for the removal of parenthesis around tokens
 #define EV_EXPAND(...) __VA_ARGS__
 
