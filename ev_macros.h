@@ -46,8 +46,13 @@
 
 #if ( EV_BUILDTYPE_DEBUG || EV_BUILDTYPE_DEBUGOPT )
 # define EV_DBGBREAK_IF(...) _EV_BREAK_IF(__VA_ARGS__)
+# define EV_DEBUG(...) __VA_ARGS__
+#include <assert.h>
+# define EV_UNIMPLEMENTED() assert(!"Hit an unimplemented path")
 #else
 # define EV_DBGBREAK_IF(...)
+# define EV_DEBUG(...)
+# define EV_UNIMPLEMENTED()
 #endif
 
 /*!
@@ -166,7 +171,7 @@
  * \brief Same as EV_FOREACH but allows passing a UDATA token
  * \note Maximum number of elements to iterate over is 64 elements.
  */
-#define EV_FOREACH(OP, UDATA, ...) EV_CAT(__EV_INTERNAL_FOREACH_UDATA, EV_VA_ARGS_NARG(__VA_ARGS__))(OP, UDATA, __VA_ARGS__)
+#define EV_FOREACH_UDATA(OP, UDATA, ...) EV_CAT(EV_CAT(__EV_INTERNAL_FOREACH, EV_VA_ARGS_NARG(__VA_ARGS__)),_UDATA)(OP, UDATA, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH1_UDATA( OP, UDATA, a     ) OP(UDATA, a)
 #define __EV_INTERNAL_FOREACH2_UDATA( OP, UDATA, a, ...) OP(UDATA, a) __EV_INTERNAL_FOREACH1_UDATA( OP, UDATA, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH3_UDATA( OP, UDATA, a, ...) OP(UDATA, a) __EV_INTERNAL_FOREACH2_UDATA( OP, UDATA, __VA_ARGS__)
