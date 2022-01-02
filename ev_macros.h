@@ -3,6 +3,24 @@
 
 #include "defines.h"
 
+// Internal Usage
+#define __EV_MACRO_IF_ELSE(cond) EV_CAT(__EV_MACRO_IF_,cond)
+#define __EV_MACRO_IF_1(...) __VA_ARGS__ __EV_MACRO_IF_1_ELSE
+#define __EV_MACRO_IF_0(...)             __EV_MACRO_IF_0_ELSE
+#define __EV_MACRO_IF_1_ELSE(...)
+#define __EV_MACRO_IF_0_ELSE(...) __VA_ARGS__
+
+#define __EV_MACRO_SECOND(a,b,...) b
+
+#define __EV_MACRO_IS_PROBE(...) __EV_MACRO_SECOND(__VA_ARGS__,0)
+#define __EV_MACRO_PROBE() ~,1
+
+#define __EV_MACRO_NOT(x) __EV_MACRO_IS_PROBE(EV_CAT(__EV_MACRO_NOT_,x))
+#define __EV_MACRO_NOT_0 __EV_MACRO_PROBE()
+
+#define __EV_MACRO_BOOL(x) __EV_MACRO_NOT(__EV_MACRO_NOT(x))
+// End Of: Internal Usage
+
 /*!
  * \brief Macro to get a type's alignment
  */
