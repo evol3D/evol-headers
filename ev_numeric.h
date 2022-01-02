@@ -1,21 +1,24 @@
 #ifndef EV_HEADERS_NUMERIC_H
 #define EV_HEADERS_NUMERIC_H
 
+#include "ev_internal.h"
+#include "ev_types.h"
+
 // Signed integers
-typedef signed char   i8;
-typedef short int     i16;
-typedef int           i32;
-typedef long long int i64;
+EV_TYPEDEF(i8 , __ev_int8_t);  TYPEDATA_GEN(i8);
+EV_TYPEDEF(i16, __ev_int16_t); TYPEDATA_GEN(i16);
+EV_TYPEDEF(i32, __ev_int32_t); TYPEDATA_GEN(i32);
+EV_TYPEDEF(i64, __ev_int64_t); TYPEDATA_GEN(i64);
 
 // Unsigned integers
-typedef unsigned char          u8;
-typedef unsigned short int     u16;
-typedef unsigned int           u32;
-typedef unsigned long long int u64;
+EV_TYPEDEF(u8 , __ev_uint8_t);  TYPEDATA_GEN(u8);
+EV_TYPEDEF(u16, __ev_uint16_t); TYPEDATA_GEN(u16);
+EV_TYPEDEF(u32, __ev_uint32_t); TYPEDATA_GEN(u32);
+EV_TYPEDEF(u64, __ev_uint64_t); TYPEDATA_GEN(u64);
 
 // Floating-Point Numbers
-typedef float  f32;
-typedef double f64;
+EV_TYPEDEF(f32, __ev_float32_t); TYPEDATA_GEN(f32);
+EV_TYPEDEF(f64, __ev_float64_t); TYPEDATA_GEN(f64);
 
 struct Int8Data  { i8  MIN; i8  MAX; };
 struct Int16Data { i16 MIN; i16 MAX; };

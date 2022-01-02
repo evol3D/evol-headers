@@ -2,17 +2,17 @@
 #define EV_HEADERS_TYPES_H
 
 #include "ev_macros.h"
-#include "ev_numeric.h"
+#include "ev_internal.h"
 
 typedef void(*ev_copy_fn)(void *dst, void *src);
 typedef void(*ev_free_fn)(void *self);
-typedef u64(*ev_hash_fn)(void *self);
+typedef __ev_uint64_t(*ev_hash_fn)(void *self);
 
 typedef struct {
   EV_DEBUG(const char *name;)
 
-  u32 size;
-  u32 alignment;
+  __ev_uint32_t size;
+  __ev_uint32_t alignment;
 
   ev_copy_fn copy_fn;
   ev_free_fn free_fn;
