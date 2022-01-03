@@ -57,9 +57,9 @@ typedef struct {
     .copy_fn = (ev_copy_fn)COPY_FUNCTION(T, DEFAULT), \
     .hash_fn = (ev_hash_fn)HASH_FUNCTION(T, DEFAULT), \
     .free_fn = (ev_free_fn)HASH_FUNCTION(T, DEFAULT), \
-    .default_val = (void*)&(T){}, \
-    .invalid_val = default_val, \
-    __VA_OPT__(EV_FOREACH_UDATA(__EV_STRUCT_METHOD_DEF, T, __VA_ARGS__)) \
+    .default_val = (void*)&(T){0}, \
+    .invalid_val = (void*)&(T){0}, \
+    EV_VA_OPT(__VA_ARGS__)(EV_FOREACH_UDATA(__EV_STRUCT_METHOD_DEF, T, __VA_ARGS__)) \
   }
 
 #define __EV_STRUCT_METHOD_DEF(T, ...) EV_CAT(__EV_,EV_CAT(EV_HEAD __VA_ARGS__,_FN))(T, EV_TAIL __VA_ARGS__)
