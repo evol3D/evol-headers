@@ -56,7 +56,7 @@ typedef struct {
     .alignment = EV_ALIGNOF(T), \
     .copy_fn = (ev_copy_fn)COPY_FUNCTION(T, DEFAULT), \
     .hash_fn = (ev_hash_fn)HASH_FUNCTION(T, DEFAULT), \
-    .free_fn = (ev_free_fn)HASH_FUNCTION(T, DEFAULT), \
+    .free_fn = (ev_free_fn)FREE_FUNCTION(T, DEFAULT), \
     .default_val = (void*)&(T){0}, \
     .invalid_val = (void*)&(T){0}, \
     EV_VA_OPT(__VA_ARGS__)(EV_FOREACH_UDATA(__EV_STRUCT_METHOD_DEF, T, __VA_ARGS__)) \
