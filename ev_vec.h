@@ -30,24 +30,22 @@
 #define EV_VEC_GROWTH_RATE 3 / 2
 #endif
 
-EV_TYPEDEF(ev_vec_t, void *);
-TYPEDATA_GEN(ev_vec_t);
-EV_TYPEDEF(ev_svec_t, void *);
-TYPEDATA_GEN(ev_svec_t);
+typedef void *ev_vec_t;
+TYPEDATA_GEN(ev_vec_t, INVALID(0));
+typedef void *ev_svec_t;
+TYPEDATA_GEN(ev_svec_t, INVALID(0));
 
-EV_TYPEDEF(ev_vec_error_t, enum {
+typedef enum {
   EV_VEC_ERR_NONE = 0,
-  EV_VEC_ERR_OOM = 1,
-});
+  EV_VEC_ERR_OOM = 1
+} ev_vec_error_t;
+TYPEDATA_GEN(ev_vec_error_t, DEFAULT(EV_VEC_ERR_NONE));
 
 #if defined(EV_VEC_SHORTNAMES)
-EV_TYPEDEF(vec_t, ev_vec_t);
-TYPEDATA_GEN(vec_t);
-EV_TYPEDEF(svec_t, ev_svec_t);
-TYPEDATA_GEN(svec_t);
+#define vec_t  ev_vec_t
+#define svec_t ev_svec_t
 
-EV_TYPEDEF(vec_error_t, ev_vec_error_t);
-TYPEDATA_GEN(vec_error_t);
+#define vec_error_t ev_vec_error_t
 
 # define vec(T)  ev_vec(T)
 # define svec(T) ev_svec(T)
