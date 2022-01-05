@@ -51,12 +51,15 @@ typedef struct {
 #define DECLARE_HASH_FUNCTION(T,name)  DEFINE_HASH_FUNCTION(T,name);
 #define DECLARE_EQUAL_FUNCTION(T,name) DEFINE_EQUAL_FUNCTION(T,name);
 
-#define EV_TYPEDEF(T, ...)        \
-  typedef __VA_ARGS__ T;          \
+#define EV_REGISTER_TYPE(T) \
   DEFINE_DEFAULT_COPY_FUNCTION(T) \
   DEFINE_DEFAULT_FREE_FUNCTION(T) \
   DEFINE_DEFAULT_HASH_FUNCTION(T) \
   DEFINE_DEFAULT_EQUAL_FUNCTION(T)
+
+#define EV_TYPEDEF(T, ...)        \
+  typedef __VA_ARGS__ T;          \
+  EV_REGISTER_TYPE(T)
 
 #define TypeData(T) EV_CAT(EV_TYPEDATA_,T)
 #define TYPEDATA_GEN(T, ...) \
