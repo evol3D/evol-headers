@@ -7,14 +7,14 @@
 
 typedef void(*ev_copy_fn)(void *dst, void *src);
 typedef void(*ev_free_fn)(void *self);
-typedef __ev_uint64_t(*ev_hash_fn)(void *self, __ev_uint64_t seed);
-typedef __ev_bool(*ev_equal_fn)(void *self, void *other);
+typedef u64(*ev_hash_fn)(void *self, u64 seed);
+typedef bool(*ev_equal_fn)(void *self, void *other);
 
 typedef struct {
   EV_DEBUG(const char *name;)
 
-  __ev_uint32_t size;
-  __ev_uint32_t alignment;
+  u32 size;
+  u32 alignment;
 
   ev_copy_fn  copy_fn;
   ev_free_fn  free_fn;
@@ -42,7 +42,7 @@ typedef struct {
 #define DEFINE_DEFAULT_HASH_FUNCTION(T) \
   DEFINE_HASH_FUNCTION(T,DEFAULT) { ev_hash_murmur3(self, sizeof(T), seed); }
 
-#define DEFINE_EQUAL_FUNCTION(T,name)  __ev_bool EQUAL_FUNCTION(T,name)(T *self, T *other)
+#define DEFINE_EQUAL_FUNCTION(T,name)  bool EQUAL_FUNCTION(T,name)(T *self, T *other)
 #define DEFINE_DEFAULT_EQUAL_FUNCTION(T) \
   DEFINE_EQUAL_FUNCTION(T,DEFAULT) { return *self == *other; }
 

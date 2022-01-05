@@ -5,30 +5,37 @@
 #include "ev_types.h"
 
 // Signed integers
-EV_TYPEDEF(i8 , __ev_int8_t);  TYPEDATA_GEN(i8);
-#define i8_const(v)  (i8){v}
-EV_TYPEDEF(i16, __ev_int16_t); TYPEDATA_GEN(i16);
-#define i16_const(v) (i16){v}
-EV_TYPEDEF(i32, __ev_int32_t); TYPEDATA_GEN(i32);
-#define i32_const(v) (i32){v}
-EV_TYPEDEF(i64, __ev_int64_t); TYPEDATA_GEN(i64);
-#define i64_const(v) (i64){v}
+EV_REGISTER_TYPE(i8);
+TYPEDATA_GEN(i8, DEFAULT(0));
+
+EV_REGISTER_TYPE(i16);
+TYPEDATA_GEN(i16, DEFAULT(0));
+
+EV_REGISTER_TYPE(i32);
+TYPEDATA_GEN(i32, DEFAULT(0));
+
+EV_REGISTER_TYPE(i64);
+TYPEDATA_GEN(i64, DEFAULT(0));
 
 // Unsigned integers
-EV_TYPEDEF(u8 , __ev_uint8_t);  TYPEDATA_GEN(u8);
-#define u8_const(v)  (u8){v}
-EV_TYPEDEF(u16, __ev_uint16_t); TYPEDATA_GEN(u16);
-#define u16_const(v) (u16){v}
-EV_TYPEDEF(u32, __ev_uint32_t); TYPEDATA_GEN(u32);
-#define u32_const(v) (u32){v}
-EV_TYPEDEF(u64, __ev_uint64_t); TYPEDATA_GEN(u64);
-#define u64_const(v) (u64){v}
+EV_REGISTER_TYPE(u8);
+TYPEDATA_GEN(u8, DEFAULT(0));
+
+EV_REGISTER_TYPE(u16);
+TYPEDATA_GEN(u16, DEFAULT(0));
+
+EV_REGISTER_TYPE(u32);
+TYPEDATA_GEN(u32, DEFAULT(0));
+
+EV_REGISTER_TYPE(u64);
+TYPEDATA_GEN(u64, DEFAULT(0));
 
 // Floating-Point Numbers
-EV_TYPEDEF(f32, __ev_float32_t); TYPEDATA_GEN(f32);
-#define f32_const(v) (f32){v}
-EV_TYPEDEF(f64, __ev_float64_t); TYPEDATA_GEN(f64);
-#define f64_const(v) (f64){v}
+EV_REGISTER_TYPE(f32);
+TYPEDATA_GEN(f32, DEFAULT(0.0f));
+
+EV_REGISTER_TYPE(f64);
+TYPEDATA_GEN(f64, DEFAULT(0.0));
 
 struct Int8Data  { i8  MIN; i8  MAX; };
 struct Int16Data { i16 MIN; i16 MAX; };

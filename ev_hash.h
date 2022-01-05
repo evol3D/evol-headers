@@ -1,7 +1,7 @@
 #ifndef EV_HEADERS_HASH_H
 #define EV_HEADERS_HASH_H
 
-#include "ev_numeric.h"
+#include "ev_internal.h"
 
 /*!
  * \brief MurmurHash3 64-bit version. Returns 64-bit hash instead of 128
