@@ -3,10 +3,11 @@
 
 #include "ev_macros.h"
 #include "ev_internal.h"
+#include "ev_hash.h"
 
 typedef void(*ev_copy_fn)(void *dst, void *src);
 typedef void(*ev_free_fn)(void *self);
-typedef __ev_uint64_t(*ev_hash_fn)(void *self);
+typedef __ev_uint64_t(*ev_hash_fn)(void *self, __ev_uint64_t seed);
 
 typedef struct {
   EV_DEBUG(const char *name;)
@@ -34,9 +35,9 @@ typedef struct {
 #define DEFINE_DEFAULT_FREE_FUNCTION(T) \
   DEFINE_FREE_FUNCTION(T,DEFAULT) { (void)self; }
 
-#define DEFINE_HASH_FUNCTION(T,name) void HASH_FUNCTION(T,name)(T *self)
+#define DEFINE_HASH_FUNCTION(T,name) void HASH_FUNCTION(T,name)(T *self, u64 seed)
 #define DEFINE_DEFAULT_HASH_FUNCTION(T) \
-  DEFINE_HASH_FUNCTION(T,DEFAULT) { (void)self; EV_UNIMPLEMENTED(); } // TODO: Add a default hash function
+  DEFINE_HASH_FUNCTION(T,DEFAULT) { ev_hash_murmur3(self, sizeof(T), seed); }
 
 #define DECLARE_COPY_FUNCTION(T,name) DEFINE_COPY_FUNCTION(T,name);
 #define DECLARE_FREE_FUNCTION(T,name) DEFINE_FREE_FUNCTION(T,name);
