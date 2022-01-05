@@ -6,7 +6,7 @@
 /*!
  * \brief MurmurHash3 64-bit version. Returns 64-bit hash instead of 128
  */
-u64 ev_hash_murmur3(const void *data, u32 len, u32 seed);
+u64 ev_hash_murmur3(const void *data, u32 len, u64 seed);
 
 #ifdef EV_HASH_IMPLEMENTATION
 #undef EV_HASH_IMPLEMENTATION
@@ -151,11 +151,11 @@ void MurmurHash3_x64_128 ( const void * key, const u32 len,
 
 //-----------------------------------------------------------------------------
 
-u64 ev_hash_murmur3(const void *data, u32 len, u32 seed)
+u64 ev_hash_murmur3(const void *data, u32 len, u64 seed)
 {
-  u8 out[16];
-  MurmurHash3_x64_128(data, len, seed, out);
-  return *(u64*)out;
+  u64 out[2];
+  MurmurHash3_x64_128(data, len, (u32)seed, out);
+  return *out;
 }
 
 #endif // EV_HASH_IMPLEMENTATION
