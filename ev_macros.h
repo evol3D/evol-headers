@@ -41,10 +41,12 @@
 # define EV_EXPORT __declspec(dllexport)
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
+# define EV_FORCEINLINE __forceinline
 #elif ( EV_CC_GCC || EV_CC_CLANG )
 # define EV_EXPORT __attribute__((visibility("default")))
 # define EV_IMPORT
 # define EV_UNUSED __attribute__((unused))
+# define EV_FORCEINLINE inline __attribute__((always_inline))
 #else
 # error "Unknown Compiler"
 #endif
