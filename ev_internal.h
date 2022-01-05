@@ -14,4 +14,8 @@ typedef unsigned long long int __ev_uint64_t;
 typedef float  __ev_float32_t;
 typedef double __ev_float64_t;
 
+typedef _Bool __ev_bool;
+#define true 1
+#define false 0
+
 #endif // EV_HEADERS_INTERNAL_H
