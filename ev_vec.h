@@ -31,9 +31,9 @@
 #endif
 
 typedef void *ev_vec_t;
-TYPEDATA_GEN(ev_vec_t, INVALID(0));
+TYPEDATA_GEN(ev_vec_t);
 typedef void *ev_svec_t;
-TYPEDATA_GEN(ev_svec_t, INVALID(0));
+TYPEDATA_GEN(ev_svec_t);
 
 typedef enum {
   EV_VEC_ERR_NONE = 0,
