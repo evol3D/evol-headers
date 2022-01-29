@@ -125,6 +125,7 @@
  * ```
  */
 #define EV_VA_OPT(...) __EV_MACRO_IF_ELSE(__EV_MACRO_NOT(EV_VA_ARGS_NARG(__VA_ARGS__)))()
+#define EV_VA_OPT_ELSE(...) __EV_MACRO_IF_ELSE(__EV_MACRO_BOOL(EV_VA_ARGS_NARG(__VA_ARGS__)))
 
 /*!
  * \brief Calls the passed macro for each element.
