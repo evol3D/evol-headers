@@ -129,11 +129,12 @@ ev_vec_init_impl(
 #define __ev_svec_init_impl(T, len, ...)                      \
     (ev_svec(T))&((struct {                                   \
       struct ev_vec_meta_t meta;                              \
-      EV_ALIGNAS(TypeData(T).alignment) T data[len];          \
+      EV_ALIGNAS(EV_ALIGNOF(T)) T data[len];          \
       }) {                                                    \
         .meta.length = len,                                   \
         .meta.capacity = len,                                 \
-        .meta.typeData = TypeData(T),                         \
+        .meta.typeData.size = sizeof(T),                      \
+        .meta.typeData.alignment = EV_ALIGNOF(T),             \
         .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
         .data = __VA_ARGS__                                   \
       }).data
@@ -141,7 +142,7 @@ ev_vec_init_impl(
 #define __ev_svec_init_w_cap_impl(T, cap)                     \
     (ev_svec(T))&((struct {                                   \
       struct ev_vec_meta_t meta;                              \
-      EV_ALIGNAS(TypeData(T).alignment) T data[cap];          \
+      EV_ALIGNAS(EV_ALIGNOF(T)) T data[cap];                  \
       }) {                                                    \
         .meta.length = 0,                                     \
         .meta.capacity = cap,                                 \
