@@ -54,7 +54,7 @@ typedef struct {
 
 #define TypeData(T) EV_CAT(EV_TYPEDATA_,T)
 #define TYPEDATA_GEN(T, ...) \
-  static const EvTypeData TypeData(T) = { \
+  EV_UNUSED static const EvTypeData TypeData(T) = { \
     EV_DEBUG(.name = EV_STRINGIZE(T),) \
     .size = sizeof(T), \
     .alignment = EV_ALIGNOF(T), \
