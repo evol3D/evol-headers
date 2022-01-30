@@ -571,7 +571,7 @@ ev_vec_setlen(
     if(grow_err) {
       return grow_err;
     }
-    __ev_vec_getmeta(*v)
+    __ev_vec_syncmeta(*v)
   }
 
   metadata->length = len;
