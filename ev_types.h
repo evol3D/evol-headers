@@ -89,7 +89,7 @@ typedef struct {
 #define EV_FREE(T)  METHOD_CHECK(TypeData(T).free_fn)
 #define EV_HASH(T)  METHOD_CHECK(TypeData(T).hash_fn)
 #define EV_EQUAL(T) METHOD_CHECK(TypeData(T).equal_fn)
-#define EV_DEFAULT(T) *(T*)TypeData(T).default_val
-#define EV_INVALID(T) *(T*)TypeData(T).invalid_val
+#define EV_DEFAULT(T) (*(T*)TypeData(T).default_val)
+#define EV_INVALID(T) (*(T*)TypeData(T).invalid_val)
 
 #endif // EV_HEADERS_TYPES_H
