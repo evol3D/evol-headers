@@ -53,7 +53,10 @@ typedef struct {
 #define DECLARE_EQUAL_FUNCTION(T,name) DEFINE_EQUAL_FUNCTION(T,name);
 
 #define TypeData(T) EV_CAT(EV_TYPEDATA_,T)
+#define TYPEDATA_STRUCT_FROM_(T)
 #define TYPEDATA_GEN(T, ...) \
+  EV_WARNING_PUSH() \
+  EV_WARNING_DISABLE("override-init") \
   EV_UNUSED static const EvTypeData TypeData(T) = { \
     EV_DEBUG(.name = EV_STRINGIZE(T),) \
     .size = sizeof(T), \
@@ -61,7 +64,8 @@ typedef struct {
     .default_val = (void*)&(T){0}, \
     .invalid_val = (void*)&(T){0}, \
     EV_VA_OPT(__VA_ARGS__)(EV_FOREACH_UDATA(__EV_STRUCT_METHOD_DEF, T, __VA_ARGS__)) \
-  }
+  }; \
+  EV_WARNING_POP()
 
 #define __EV_STRUCT_METHOD_DEF(T, ...) EV_CAT(__EV_,EV_CAT(EV_HEAD __VA_ARGS__,_FN))(T, EV_TAIL __VA_ARGS__)
 
