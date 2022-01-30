@@ -37,7 +37,12 @@
  */
 #define EV_UNALIGNED
 
+#define EV_PRAGMA(...) _Pragma(EV_STRINGIZE(__VA_ARGS__))
+
 #if ( EV_CC_MSVC )
+# define EV_WARNING_DISABLE(...) EV_UNIMPLEMENTED()
+# define EV_WARNING_PUSH() EV_UNIMPLEMENTED()
+# define EV_WARNING_POP() EV_UNIMPLEMENTED()
 # define EV_EXPORT __declspec(dllexport)
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
@@ -47,6 +52,14 @@
 # define EV_IMPORT
 # define EV_UNUSED __attribute__((unused))
 # define EV_FORCEINLINE inline __attribute__((always_inline))
+# if ( EV_CC_GCC )
+#  define EV_PRAGMA_CC_NAME GCC
+# elif ( EV_CC_CLANG )
+#  define EV_PRAGMA_CC_NAME clang
+# endif
+# define EV_WARNING_DISABLE(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
+# define EV_WARNING_PUSH()     EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic push)
+# define EV_WARNING_POP()      EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic pop)
 #else
 # error "Unknown Compiler"
 #endif
