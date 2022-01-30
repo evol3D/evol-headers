@@ -10,6 +10,8 @@
 #include <stddef.h>
 #include <stdarg.h>
 
+#define EV_STR_evstring_MAGIC (0x65767374)
+
 #ifdef EV_STR_SHARED
     #if defined (EV_STR_IMPL)
         #define EV_STR_API EV_EXPORT
@@ -202,8 +204,6 @@ evstring_findLastChar(
 #include <stdlib.h>
 
 #define META(s) (((struct evstr_meta_t *)(s)) - 1)
-
-#define EV_STR_evstring_MAGIC (0x65767374)
 
 #if EV_BUILDTYPE_DEBUG || EV_BUILDTYPE_DEBUGOPT
 #define evstr_asserttype(str) \
