@@ -58,9 +58,11 @@
 # if ( EV_CC_GCC )
 #  define EV_PRAGMA_CC_NAME GCC
 #  define EV_WARNING_DISABLE_GCC(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
+#  define EV_WARNING_DISABLE_CLANG(...)
 # elif ( EV_CC_CLANG )
 #  define EV_PRAGMA_CC_NAME clang
 #  define EV_WARNING_DISABLE_CLANG(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
+#  define EV_WARNING_DISABLE_GCC(...)
 # endif
 # define EV_WARNING_PUSH()     EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic push)
 # define EV_WARNING_POP()      EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic pop)
