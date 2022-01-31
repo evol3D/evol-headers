@@ -40,13 +40,16 @@
 #define EV_PRAGMA(...) _Pragma(EV_STRINGIZE(__VA_ARGS__))
 
 #if ( EV_CC_MSVC )
-# define EV_WARNING_DISABLE(...) EV_UNIMPLEMENTED()
-# define EV_WARNING_PUSH() EV_UNIMPLEMENTED()
-# define EV_WARNING_POP() EV_UNIMPLEMENTED()
+# define EV_WARNING_DISABLE_MSVC(w) EV_PRAGMA(warning(disable:w))
+# define EV_WARNING_PUSH() EV_PRAGMA(warning(push))
+# define EV_WARNING_POP() EV_PRAGMA(warning(pop))
 # define EV_EXPORT __declspec(dllexport)
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
 # define EV_FORCEINLINE __forceinline
+
+# define EV_WARNING_DISABLE_CLANG(...)
+# define EV_WARNING_DISABLE_GCC(...)
 #elif ( EV_CC_GCC || EV_CC_CLANG )
 # define EV_EXPORT __attribute__((visibility("default")))
 # define EV_IMPORT
@@ -54,12 +57,15 @@
 # define EV_FORCEINLINE inline __attribute__((always_inline))
 # if ( EV_CC_GCC )
 #  define EV_PRAGMA_CC_NAME GCC
+#  define EV_WARNING_DISABLE_GCC(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
 # elif ( EV_CC_CLANG )
 #  define EV_PRAGMA_CC_NAME clang
+#  define EV_WARNING_DISABLE_CLANG(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
 # endif
-# define EV_WARNING_DISABLE(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
 # define EV_WARNING_PUSH()     EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic push)
 # define EV_WARNING_POP()      EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic pop)
+
+#define EV_WARNING_DISABLE_MSVC()
 #else
 # error "Unknown Compiler"
 #endif
