@@ -55,8 +55,9 @@ typedef struct {
 #define TypeData(T) EV_CAT(EV_TYPEDATA_,T)
 #define TYPEDATA_STRUCT_FROM_(T)
 #define TYPEDATA_GEN(T, ...) \
-  EV_WARNING_PUSH() \
-  EV_WARNING_DISABLE("override-init") \
+  EV_WARNING_PUSH(); \
+  EV_WARNING_DISABLE_GCC("override-init"); \
+  EV_WARNING_DISABLE_CLANG("override-init"); \
   EV_UNUSED static const EvTypeData TypeData(T) = { \
     EV_DEBUG(.name = EV_STRINGIZE(T),) \
     .size = sizeof(T), \
