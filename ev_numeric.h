@@ -83,10 +83,10 @@ static const struct UInt64Data UInt64 =
 
 static const struct Float32Data Float32 =
 {
-  .MIN_POS =  1.175494351e-38,
-  .MIN     = -3.402823466e+38,
-  .MAX     =  3.402823466e+38,
-  .EPS     =  1.192093e-07
+  .MIN_POS =  1.175494351e-38f,
+  .MIN     = -3.402823466e+38f,
+  .MAX     =  3.402823466e+38f,
+  .EPS     =  1.192093e-07f
 };
 
 static const struct Float64Data Float64 =
