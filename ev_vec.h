@@ -443,14 +443,14 @@ ev_vec_push_impl(
 
 void *
 ev_vec_iter_begin(
-    vec_t v)
+    ev_vec_t v)
 {
   return v;
 }
 
 void *
 ev_vec_iter_end(
-    vec_t v)
+    ev_vec_t v)
 {
   __ev_vec_getmeta(v)
 
@@ -459,7 +459,7 @@ ev_vec_iter_end(
 
 void
 ev_vec_iter_next(
-    vec_t v,
+    ev_vec_t v,
     void **iter)
 {
   __ev_vec_getmeta(v)
@@ -616,7 +616,7 @@ ev_vec_grow(
     ev_vec_t *v)
 {
   __ev_vec_getmeta(*v)
-  return vec_setcapacity(v, metadata->capacity * EV_VEC_GROWTH_RATE);
+  return ev_vec_setcapacity(v, metadata->capacity * EV_VEC_GROWTH_RATE);
 }
 
 #endif
