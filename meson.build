@@ -1,4 +1,5 @@
-project('evol-headers', 'c')
+project('evol-headers', 'c',
+  default_options : [ 'c_std=gnu17' ])
 
 headers_include = include_directories('.')
 
@@ -10,6 +11,11 @@ elif buildtype == 'debugoptimized'
   evh_c_args += '-DEV_BUILDTYPE_DEBUGOPT=1'
 else
   evh_c_args += '-DEV_BUILDTYPE_RELEASE=1'
+endif
+
+cc = meson.get_compiler('c')
+if cc.get_id() == 'msvc'
+  evh_c_args += '/Zc:preprocessor'
 endif
 
 # All other targets should follow the same template
