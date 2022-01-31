@@ -30,6 +30,12 @@
 #define EV_VEC_GROWTH_RATE 3 / 2
 #endif
 
+#if EV_CC_MSVC
+# define __EV_VEC_EMPTY_ARRAY { 0 }
+#else
+# define __EV_VEC_EMPTY_ARRAY {   }
+#endif
+
 typedef void *ev_vec_t;
 TYPEDATA_GEN(ev_vec_t);
 typedef void *ev_svec_t;
@@ -150,7 +156,7 @@ ev_vec_init_impl(
         .meta.typeData.size = sizeof(T),                      \
         .meta.typeData.alignment = EV_ALIGNOF(T),             \
         .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
-        .data = { 0 }                                         \
+        .data = __EV_VEC_EMPTY_ARRAY                          \
       }).data
 
 #define ev_vec_push(v, x) ev_vec_push_impl((ev_vec_t*)&v,&x);
