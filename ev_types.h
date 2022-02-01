@@ -52,8 +52,8 @@ typedef struct {
 #define DECLARE_HASH_FUNCTION(T,name)  DEFINE_HASH_FUNCTION(T,name);
 #define DECLARE_EQUAL_FUNCTION(T,name) DEFINE_EQUAL_FUNCTION(T,name);
 
+#define EV_OVERRIDE_VAR(T) EV_CAT(__ev_internal_override_var_,T)
 #define TypeData(T) EV_CAT(EV_TYPEDATA_,T)
-#define TYPEDATA_STRUCT_FROM_(T)
 #define TYPEDATA_GEN(T, ...) \
   EV_WARNING_PUSH(); \
   EV_WARNING_DISABLE_GCC("override-init"); \
@@ -66,7 +66,8 @@ typedef struct {
     .invalid_val = (void*)&(T){0}, \
     EV_VA_OPT(__VA_ARGS__)(EV_FOREACH_UDATA(__EV_STRUCT_METHOD_DEF, T, __VA_ARGS__)) \
   }; \
-  EV_WARNING_POP()
+  EV_WARNING_POP(); \
+  EV_UNUSED static T EV_OVERRIDE_VAR(T)
 
 #define __EV_STRUCT_METHOD_DEF(T, ...) EV_CAT(__EV_,EV_CAT(EV_HEAD __VA_ARGS__,_FN))(T, EV_TAIL __VA_ARGS__)
 
@@ -90,7 +91,13 @@ typedef struct {
 #define EV_FREE(T)  METHOD_CHECK(TypeData(T).free_fn)
 #define EV_HASH(T)  METHOD_CHECK(TypeData(T).hash_fn)
 #define EV_EQUAL(T) METHOD_CHECK(TypeData(T).equal_fn)
-#define EV_DEFAULT(T) (*(T*)TypeData(T).default_val)
+#define __EV_OVERRIDE_DEFAULT(T, ...) EV_OVERRIDE_VAR(T).__VA_ARGS__,
+#define __EV_DEFAULT_INTERNAL(T) (*(T*)TypeData(T).default_val)
+#define EV_DEFAULT(T, ...) EV_VA_OPT_ELSE(__VA_ARGS__) \
+                              ((EV_OVERRIDE_VAR(T)=__EV_DEFAULT_INTERNAL(T), \
+                                EV_FOREACH_UDATA(__EV_OVERRIDE_DEFAULT, T, __VA_ARGS__) \
+                                EV_OVERRIDE_VAR(T))) \
+                              (__EV_DEFAULT_INTERNAL(T))
 #define EV_INVALID(T) (*(T*)TypeData(T).invalid_val)
 
 #endif // EV_HEADERS_TYPES_H

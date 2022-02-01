@@ -41,15 +41,14 @@
 
 #if ( EV_CC_MSVC )
 # define EV_WARNING_DISABLE_MSVC(w) EV_PRAGMA(warning(disable:w))
+# define EV_WARNING_DISABLE_CLANG(...)
+# define EV_WARNING_DISABLE_GCC(...)
 # define EV_WARNING_PUSH() EV_PRAGMA(warning(push))
 # define EV_WARNING_POP() EV_PRAGMA(warning(pop))
 # define EV_EXPORT __declspec(dllexport)
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
 # define EV_FORCEINLINE __forceinline
-
-# define EV_WARNING_DISABLE_CLANG(...)
-# define EV_WARNING_DISABLE_GCC(...)
 #elif ( EV_CC_GCC || EV_CC_CLANG )
 # define EV_EXPORT __attribute__((visibility("default")))
 # define EV_IMPORT
@@ -66,8 +65,7 @@
 # endif
 # define EV_WARNING_PUSH()     EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic push)
 # define EV_WARNING_POP()      EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic pop)
-
-#define EV_WARNING_DISABLE_MSVC()
+# define EV_WARNING_DISABLE_MSVC(...)
 #else
 # error "Unknown Compiler"
 #endif

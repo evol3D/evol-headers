@@ -132,9 +132,8 @@ ev_vec_init_impl(
 #define ev_svec_init(T, ...) __ev_svec_init_impl(T, EV_ARRSIZE((T[])__VA_ARGS__), __VA_ARGS__)
 #define ev_svec_init_w_cap(T, cap) __ev_svec_init_w_cap_impl(T, cap)
 
-#define __ev_svec_structname(T) EV_CAT(EV_CAT(svec_type_##T##_,__COUNTER__),__LINE__)
 #define __ev_svec_init_impl(T, len, ...)                      \
-    (ev_svec(T))&((struct __ev_svec_structname(T) {           \
+    (ev_svec(T))&((struct {                                   \
       struct ev_vec_meta_t meta;                              \
       EV_ALIGNAS(EV_ALIGNOF(T)) T data[len];                  \
       }) {                                                    \
@@ -147,7 +146,7 @@ ev_vec_init_impl(
       }).data
 
 #define __ev_svec_init_w_cap_impl(T, cap)                     \
-    (ev_svec(T))&((struct __ev_svec_structname(T) {           \
+    (ev_svec(T))&((struct {                                   \
       struct ev_vec_meta_t meta;                              \
       EV_ALIGNAS(EV_ALIGNOF(T)) T data[cap];                  \
       }) {                                                    \
