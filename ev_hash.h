@@ -44,6 +44,7 @@ static inline u64 rotl64 ( u64 x, i8 r )
 
 #endif // EV_CC_MSVC
 
+#include "ev_macros.h"
 
 //-----------------------------------------------------------------------------
 // Block read - if your platform needs to do endian-swapping or can only

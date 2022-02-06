@@ -582,6 +582,9 @@ ev_vec_setlen(
     __ev_vec_syncmeta(*v)
   }
 
+  // TODO if new_len < old_len:
+  //        vec_pop(old_len - new_len)
+
   metadata->length = len;
   return EV_VEC_ERR_NONE;
 }
