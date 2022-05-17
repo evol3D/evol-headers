@@ -286,4 +286,9 @@
 #define __EV_INTERNAL_FOREACH63_UDATA(OP, UDATA, a, ...) OP(UDATA, a) __EV_INTERNAL_FOREACH62_UDATA(OP, UDATA, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH64_UDATA(OP, UDATA, a, ...) OP(UDATA, a) __EV_INTERNAL_FOREACH63_UDATA(OP, UDATA, __VA_ARGS__)
 
+/*!
+ * \brief Macro to get a the hex value of a 4-number as a character
+ */
+#define EV_TOHEX_CHAR(c) (("0123456789abcdef")[c])
+
 #endif // EV_HEADERS_MACROS_H
