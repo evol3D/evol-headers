@@ -158,7 +158,7 @@ ev_vec_init_impl(
         .data = __EV_VEC_EMPTY_ARRAY                          \
       }).data
 
-#define ev_vec_push(v, x) ev_vec_push_impl((ev_vec_t*)&v,&x);
+#define ev_vec_push(v, ...) ev_vec_push_impl((ev_vec_t*)&v,&__VA_ARGS__);
 
 /*!
  * \param v The vector that we want an iterator for
