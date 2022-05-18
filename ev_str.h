@@ -429,7 +429,7 @@ evstring_push_impl(
     }
 
     memcpy((*s) + meta->length, data, sz);
-    printf("Memcpy: dst = (*s {%p}) + meta->length {%llu}, src = data {%p}, size = sz {%llu}\n", *s, meta->length, data, sz);
+    // printf("Memcpy: dst = (*s {%p}) + meta->length {%llu}, src = data {%p}, size = sz {%llu}\n", *s, meta->length, data, sz);
     meta->length += sz;
 
     (*s)[meta->length] = '\0';
