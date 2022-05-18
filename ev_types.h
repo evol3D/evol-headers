@@ -37,24 +37,24 @@ typedef struct {
 #define TOSTR_FUNCTION(T,name)    EV_CAT(EV_CAT(EV_CAT(EV_TOSTR_FUNCTION_,T),_),name)
 #define TOSTRLEN_FUNCTION(T,name) EV_CAT(EV_CAT(EV_CAT(EV_TOSTRLEN_FUNCTION_,T),_),name)
 
-#define DEFINE_COPY_FUNCTION(T,name) void COPY_FUNCTION(T,name)(T *dst, T *src)
+#define DEFINE_COPY_FUNCTION(T,name) static inline void COPY_FUNCTION(T,name)(T *dst, T *src)
 #define DEFINE_DEFAULT_COPY_FUNCTION(T) \
   DEFINE_COPY_FUNCTION(T,DEFAULT) { *dst = *src; }
 
-#define DEFINE_FREE_FUNCTION(T,name) void FREE_FUNCTION(T,name)(T *self)
+#define DEFINE_FREE_FUNCTION(T,name) static inline void FREE_FUNCTION(T,name)(T *self)
 #define DEFINE_DEFAULT_FREE_FUNCTION(T) \
   DEFINE_FREE_FUNCTION(T,DEFAULT) { (void)self; }
 
-#define DEFINE_HASH_FUNCTION(T,name) void HASH_FUNCTION(T,name)(T *self, u64 seed)
+#define DEFINE_HASH_FUNCTION(T,name) static inline void HASH_FUNCTION(T,name)(T *self, u64 seed)
 #define DEFINE_DEFAULT_HASH_FUNCTION(T) \
   DEFINE_HASH_FUNCTION(T,DEFAULT) { ev_hash_murmur3(self, sizeof(T), seed); }
 
-#define DEFINE_EQUAL_FUNCTION(T,name) bool EQUAL_FUNCTION(T,name)(T *self, T *other)
+#define DEFINE_EQUAL_FUNCTION(T,name) static inline bool EQUAL_FUNCTION(T,name)(T *self, T *other)
 // NOTE: This shouldn't be used for non-arithmetic types.
 #define DEFINE_DEFAULT_EQUAL_FUNCTION(T) \
   DEFINE_EQUAL_FUNCTION(T,DEFAULT) { return memcmp(self, other, sizeof(T)); }
 
-#define DEFINE_TOSTR_FUNCTION(T,name) void TOSTR_FUNCTION(T,name)(T *self, char* out)
+#define DEFINE_TOSTR_FUNCTION(T,name) static inline void TOSTR_FUNCTION(T,name)(T *self, char* out)
 #define DEFINE_DEFAULT_TOSTR_FUNCTION(T) \
   DEFINE_TOSTR_FUNCTION(T,DEFAULT) \
   {  \
@@ -66,7 +66,7 @@ typedef struct {
     } \
   }
 
-#define DEFINE_TOSTRLEN_FUNCTION(T,name) u32 TOSTRLEN_FUNCTION(T,name)()
+#define DEFINE_TOSTRLEN_FUNCTION(T,name) static inline u32 TOSTRLEN_FUNCTION(T,name)()
 #define DEFINE_DEFAULT_TOSTRLEN_FUNCTION(T) \
   DEFINE_TOSTRLEN_FUNCTION(T,DEFAULT) { return sizeof(T) * 2; }
 
@@ -114,7 +114,7 @@ typedef struct {
 #define __EV_DEFAULT_FN(T, ...)  .default_val = (void*)&(T){ __VA_ARGS__ },
 #define __EV_INVALID_FN(T, ...)  .invalid_val = (void*)&(T){ __VA_ARGS__ },
 
-void nop() {}
+static void nop() {}
 #define METHOD_CHECK(T, ...) (__VA_ARGS__ EV_DEBUG(?__VA_ARGS__:(assert(!EV_STRINGIZE(__VA_ARGS__)"not defined"),(T)nop)))
 
 #define EV_COPY(T)     METHOD_CHECK(ev_copy_fn,     TypeData(T).copy_fn)
