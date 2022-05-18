@@ -132,4 +132,25 @@ static void nop() {}
                               (__EV_DEFAULT_INTERNAL(T))
 #define EV_INVALID(T) (*(T*)TypeData(T).invalid_val)
 
+#if defined(EV_BUILDTYPE_DEBUG) || defined(EV_BUILDTYPE_DEBUGOPT)
+#include <stdio.h>
+#endif
+DEFINE_TOSTR_FUNCTION(EvTypeData, EvTypeDataStringize)
+{
+  EV_DEBUG(
+      sprintf(out,
+              "TypeData:\n"
+     EV_DEBUG("\t name: %s\n")
+              "\t size: %u\n"
+              "\t alig: %u\n",
+     EV_DEBUG(self->name),
+              self->size,
+              self->alignment
+      );
+  )
+}
+
+TYPEDATA_GEN(EvTypeData,
+    TOSTR(EvTypeDataStringize));
+
 #endif // EV_HEADERS_TYPES_H
