@@ -11,6 +11,7 @@
 #define __EV_MACRO_IF_0_ELSE(...) __VA_ARGS__
 
 #define __EV_MACRO_SECOND(a,b,...) b
+#define __EV_MACRO_SECOND_INDIRECT() __EV_MACRO_SECOND
 
 #define __EV_MACRO_IS_PROBE(...) __EV_MACRO_SECOND(__VA_ARGS__,0)
 #define __EV_MACRO_PROBE() ~,1
@@ -109,6 +110,11 @@
 #define EV_CAT_IMPL(a, ...) a##__VA_ARGS__
 
 /*!
+ * \brief Macro to concatenate multiple tokens together
+ */
+#define EV_CATN(...) EV_REDUCE(EV_CAT, __VA_ARGS__)
+
+/*!
  * \brief Macro to wrap tokens in double quotations. (")
  */
 #define EV_STRINGIZE(...) EV_STRINGIZE_IMPL(__VA_ARGS__)
@@ -186,6 +192,31 @@
 #define __EV_INTERNAL_FOREACH_UDATA_IMPL(OP, UDATA, a, ...) \
   OP(UDATA, a) EV_INDIRECT_OP_ELSE_NOP(__EV_INTERNAL_FOREACH_UDATA_IMPL_INDIRECT, __VA_ARGS__)(OP, UDATA, __VA_ARGS__)
 #define __EV_INTERNAL_FOREACH_UDATA_IMPL_INDIRECT() __EV_INTERNAL_FOREACH_UDATA_IMPL
+
+#define EV_JOIN(...) \
+  EV_JOIN_W_DELIM((,),__VA_ARGS__)
+
+#define EV_JOIN_W_DELIM(delim, ...) \
+  EV_VA_OPT(__VA_ARGS__)(EV_EVAL(__EV_INTERNAL_JOIN_W_DELIM_IMPL(delim, __VA_ARGS__)))
+#define __EV_INTERNAL_JOIN_W_DELIM_IMPL(delim, a, ...) \
+  a EV_INDIRECT_OP_ELSE_NOP(EV_EXPAND delim __EV_INTERNAL_JOIN_W_DELIM_IMPL_INDIRECT, __VA_ARGS__)(delim, __VA_ARGS__)
+#define __EV_INTERNAL_JOIN_W_DELIM_IMPL_INDIRECT() __EV_INTERNAL_JOIN_W_DELIM_IMPL
+
+#define DEFAULT_ZIP_OP(a, b) (a, b)
+#define EV_ZIP(list1, list2) \
+  EV_ZIP_W_OP(DEFAULT_ZIP_OP, list1, list2)
+
+#define EV_ZIP_W_OP(OP, list1, list2) \
+  EV_VA_OPT(EV_EXPAND list1)(EV_EVAL(__EV_INTERNAL_ZIP_W_OP_IMPL(OP, list1, list2)))
+#define __EV_INTERNAL_ZIP_W_OP_IMPL(OP, list1, list2) \
+  OP(EV_HEAD list1, EV_HEAD list2) EV_INDIRECT_OP_ELSE_NOP(__EV_INTERNAL_ZIP_W_OP_IMPL_INDIRECT, EV_TAIL list1)(OP, (EV_TAIL list1), (EV_TAIL list2))
+#define __EV_INTERNAL_ZIP_W_OP_IMPL_INDIRECT() , __EV_INTERNAL_ZIP_W_OP_IMPL
+
+#define EV_REDUCE(OP, ...) \
+  EV_VA_OPT(__VA_ARGS__)(EV_EVAL(EV_INDIRECT_OP_ELSE_NOP(__EV_INTERNAL_REDUCE_IMPL_INDIRECT, __VA_ARGS__)(OP, EV_HEAD(__VA_ARGS__), EV_TAIL(__VA_ARGS__))))
+#define __EV_INTERNAL_REDUCE_IMPL(OP, last, ...) \
+  EV_DEFER(EV_VA_OPT_ELSE(__VA_ARGS__)(__EV_INTERNAL_REDUCE_IMPL_INDIRECT)(__EV_MACRO_SECOND_INDIRECT))()(OP, EV_VA_OPT_ELSE(__VA_ARGS__)(OP(last, EV_HEAD(__VA_ARGS__)))(last) EV_VA_OPT(__VA_ARGS__)(,EV_TAIL(__VA_ARGS__)))
+#define __EV_INTERNAL_REDUCE_IMPL_INDIRECT() __EV_INTERNAL_REDUCE_IMPL
 
 /*!
  * \brief Macro to get a the hex value of a 4-number as a character
