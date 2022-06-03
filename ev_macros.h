@@ -53,11 +53,13 @@
 # define EV_IMPORT __declspec(dllimport)
 # define EV_UNUSED
 # define EV_FORCEINLINE __forceinline
+# define EV_ALIGN(x) __declspec(align(x))
 #elif ( EV_CC_GCC || EV_CC_CLANG )
 # define EV_EXPORT __attribute__((visibility("default")))
 # define EV_IMPORT
 # define EV_UNUSED __attribute__((unused))
 # define EV_FORCEINLINE inline __attribute__((always_inline))
+# define EV_ALIGN(x) __attribute__((aligned(x)))
 # if ( EV_CC_GCC )
 #  define EV_PRAGMA_CC_NAME GCC
 #  define EV_WARNING_DISABLE_GCC(w) EV_PRAGMA(EV_PRAGMA_CC_NAME diagnostic ignored "-W"w)
