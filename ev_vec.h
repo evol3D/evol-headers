@@ -37,9 +37,7 @@
 #endif
 
 typedef void *ev_vec_t;
-TYPEDATA_GEN(ev_vec_t);
 typedef void *ev_svec_t;
-TYPEDATA_GEN(ev_svec_t);
 
 typedef enum {
   EV_VEC_ERR_NONE = 0,
@@ -356,6 +354,15 @@ ev_vec_setcapacity(
 EV_VEC_API ev_vec_error_t
 ev_vec_grow(
   ev_vec_t *v);
+
+TYPEDATA_GEN(
+    ev_vec_t,
+    INVALID(ev_svec_init_w_cap(i32, 0))
+);
+TYPEDATA_GEN(
+    ev_svec_t,
+    INVALID(ev_svec_init_w_cap(i32, 0))
+);
 
 #ifdef EV_VEC_IMPLEMENTATION
 #undef EV_VEC_IMPLEMENTATION
