@@ -48,10 +48,10 @@ typedef enum {
 TYPEDATA_GEN(ev_vec_error_t, DEFAULT(EV_VEC_ERR_NONE));
 
 #if defined(EV_VEC_SHORTNAMES)
-#define vec_t  ev_vec_t
-#define svec_t ev_svec_t
+# define vec_t  ev_vec_t
+# define svec_t ev_svec_t
 
-#define vec_error_t ev_vec_error_t
+# define vec_error_t ev_vec_error_t
 
 # define vec(T)  ev_vec(T)
 # define svec(T) ev_svec(T)
@@ -155,36 +155,51 @@ ev_vec_init_impl(
         .data = __EV_VEC_EMPTY_ARRAY                          \
       }).data
 
-#define ev_vec_push(v, ...) ev_vec_push_impl((ev_vec_t*)&v,&__VA_ARGS__);
+/*!
+ * \brief Syntactic sugar for `ev_vec_push_impl()` that allows multiple pushed in the same statement.
+ * \details Sample usage:
+ * ```
+ * ev_vec_t v;
+ * i32 x = 1;
+ * i32 y = 2;
+ * ev_vec_push(&v, &x);                   // ev_vec_push_impl(&v, &x);
+ * ev_vec_push(&v, &x, &y);               // ev_vec_push_impl(&v, &x); ev_vec_push_impl(&v, &y);
+ * ```
+ *
+ * *Note* This is possibly replaceable with a variadic function.
+ */
+#define ev_vec_push(v, ...) \
+  EV_FOREACH_UDATA(__ev_vec_internal_push, v, __VA_ARGS__);
+#define __ev_vec_internal_push(v, var) ev_vec_push_impl((ev_vec_t*)v, var);
 
 /*!
- * \param v The vector that we want an iterator for
+ * \param v A pointer to the vector that we want an iterator for
  *
  * \returns A pointer to the first element in a vector
  */
 EV_VEC_API void *
 ev_vec_iter_begin(
-  ev_vec_t v);
+  const ev_vec_t* v);
 
 /*!
- * \param v The vector that we want an iterator for
+ * \param v A pointer to the vector that we want an iterator for
  *
  * \returns A pointer to the memory block right after the last element in the vector
  */
 EV_VEC_API void *
 ev_vec_iter_end(
-  ev_vec_t v);
+  const ev_vec_t* v);
 
 /*!
  * \brief A function that increments an iterator to make it point to the next
  * element in the vector
  *
- * \param v The vector that is being iterated over
+ * \param v A pointer to the vector that is being iterated over
  * \param iter Reference to the iterator that is being incremented
  */
 EV_VEC_API void
 ev_vec_iter_next(
-  ev_vec_t v, 
+  const ev_vec_t* v, 
   void **iter);
 
 /*!
@@ -195,11 +210,11 @@ ev_vec_iter_next(
  * *Note*: For stack-allocated vectors (`svec`), destructors are called for 
  * elements but no memory is freed.
  *
- * \param v The vector that is being destroyed
+ * \param v A pointer to the vector that is being destroyed
  */
 EV_VEC_API void
 ev_vec_fini(
-  ev_vec_t v);
+  ev_vec_t* v);
 
 /*!
  * \brief A function that copies a value to the end of a vector. If the element
@@ -253,48 +268,48 @@ ev_vec_append(
 /*!
  * \brief A function that returns the last element in the vector.
  *
- * \param v Reference to the vector object
+ * \param v A pointer to the vector object
  * 
  * \returns Pointer to the last element in the vector. NULL if the vector is
  * empty.
  */
 EV_VEC_API void *
 ev_vec_last(
-    ev_vec_t v);
+    const ev_vec_t* v);
 
 /*!
  * \brief A function that returns the length of a vector
  *
- * \param v The vector object
+ * \param v A pointer to the vector object
  *
  * \returns Current length of the vector
  */
 EV_VEC_API u64
 ev_vec_len(
-  ev_vec_t v);
+  const ev_vec_t* v);
 
 /*!
  * \brief A function that returns the capacity of a vector
  *
- * \param v The vector object
+ * \param v A pointer to the vector object
  *
  * \returns Current capacity of the vector
  */
 EV_VEC_API u64
 ev_vec_capacity(
-  ev_vec_t v);
+  const ev_vec_t* v);
 
 /*!
  * \brief Calls the free operation (if exists) on every element, then sets
  * the length to 0.
  *
- * \param v The vector object
+ * \param v A pointer to the vector object
  *
  * \returns 0 on success
  */
 EV_VEC_API u32
 ev_vec_clear(
-  ev_vec_t v);
+  const ev_vec_t* v);
 
 /*!
  * \brief Sets the length of the vector to `len`.
@@ -346,7 +361,7 @@ ev_vec_grow(
 #undef EV_VEC_IMPLEMENTATION
 
 #ifdef EV_VEC_API_CHECK
-#define EV_VEC_CHECK(x) do { x; } while(0)
+#define EV_VEC_CHECK(x) do { x; } while (0)
 #else
 #define EV_VEC_CHECK(x)
 #endif
@@ -384,9 +399,9 @@ ev_vec_init_impl(
 
 void
 ev_vec_fini(
-    ev_vec_t v)
+    ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
 
   if (metadata->typeData.free_fn) {
     for (void *elem = ev_vec_iter_begin(v); elem != ev_vec_iter_end(v);
@@ -397,6 +412,8 @@ ev_vec_fini(
   if(metadata->allocationType == EV_VEC_ALLOCATION_TYPE_HEAP) {
     free(metadata);
   }
+
+  *v = EV_INVALID(ev_vec_t);
 }
 
 int
@@ -427,26 +444,26 @@ ev_vec_push_impl(
 
 void *
 ev_vec_iter_begin(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  return v;
+  return *v;
 }
 
 void *
 ev_vec_iter_end(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
 
-  return ((char *)v) + (metadata->typeData.size * metadata->length);
+  return ((char *)*v) + (metadata->typeData.size * metadata->length);
 }
 
 void
 ev_vec_iter_next(
-    ev_vec_t v,
+    const ev_vec_t* v,
     void **iter)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
   *iter = ((char*)*iter) + metadata->typeData.size;
 }
 
@@ -500,38 +517,38 @@ ev_vec_pop(
 
 void *
 ev_vec_last(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
 
   if(metadata->length == 0) {
     return NULL;
   }
 
-  return ((char *)v) + ((metadata->length-1) * metadata->typeData.size);
+  return ((char *)*v) + ((metadata->length-1) * metadata->typeData.size);
 }
 
 u64
 ev_vec_len(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
   return metadata->length;
 }
 
 u64
 ev_vec_capacity(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
   return metadata->capacity;
 }
 
 u32
 ev_vec_clear(
-    ev_vec_t v)
+    const ev_vec_t* v)
 {
-  __ev_vec_getmeta(v)
+  __ev_vec_getmeta(*v)
 
   if (metadata->typeData.free_fn) {
     for (void *elem = ev_vec_iter_begin(v); elem != ev_vec_iter_end(v);
