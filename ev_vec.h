@@ -62,7 +62,6 @@ TYPEDATA_GEN(ev_vec_error_t, DEFAULT(EV_VEC_ERR_NONE));
 # define vec_iter_begin  ev_vec_iter_begin
 # define vec_iter_end    ev_vec_iter_end
 # define vec_iter_next   ev_vec_iter_next
-# define vec_foreach     ev_vec_foreach
 # define vec_fini        ev_vec_fini
 # define vec_push        ev_vec_push
 # define vec_append      ev_vec_append
@@ -79,7 +78,7 @@ TYPEDATA_GEN(ev_vec_error_t, DEFAULT(EV_VEC_ERR_NONE));
  * \brief For the sake of readability
  * \details Sample usage:
  * ```
- * ev_vec(int) v = ev_vec_init(int, 0, 0);
+ * ev_vec(int) v = ev_vec_init(int);
  * ```
  */
 #define ev_vec(T) T*
@@ -122,9 +121,7 @@ ev_vec_init_impl(
  * \brief Syntactic sugar for `ev_vec_init_impl()`
  * \details Sample usage:
  * ```
- * ev_vec_init(int);                   // ev_vec_init_impl(sizeof(int), NULL, NULL);
- * ev_vec_init(int, fn_destr);         // ev_vec_init_impl(sizeof(int), NULL, fn_destr);
- * ev_vec_init(int, fn_cpy, fn_destr); // ev_vec_init_impl(sizeof(int), fn_cpy, fn_destr);
+ * ev_vec_init(i32);                   // ev_vec_init_impl(TypeData(i32));
  * ```
  */
 #define ev_vec_init(T) ev_vec_init_impl(TypeData(T))
@@ -191,9 +188,9 @@ ev_vec_iter_next(
   void **iter);
 
 /*!
- * \brief A function that destroys a vector object. If a destructor function was
- * passed while initializing the vector, then this function is called on every
- * element before all reserved memory is freed.
+ * \brief A function that destroys a vector object. If the element type has a 
+ * destructor function, then this function is called on every element before 
+ * all reserved memory is freed.
  *
  * *Note*: For stack-allocated vectors (`svec`), destructors are called for 
  * elements but no memory is freed.
@@ -205,11 +202,11 @@ ev_vec_fini(
   ev_vec_t v);
 
 /*!
- * \brief A function that copies a value to the end of a vector. If a copy
- * function was passed while initializing the vector, then this function is
- * called to copy the new element into the vector. Otherwise, memcpy is used
- * with a length of `vec_meta.elemsize`. If a resize is needed but fails due to
- * 'OOM' issues, then the vector is left unchanged and VEC_ERR_OOM is returned.
+ * \brief A function that copies a value to the end of a vector. If the element
+ * type has a copy function, then this function is called to copy the new element 
+ * into the vector. Otherwise, memcpy is used with a the element type size as a
+ * copy length. If a resize is needed but fails due to 'OOM' issues, then the 
+ * vector is left unchanged and VEC_ERR_OOM is returned.
  *
  * For `svec`, as long as the capacity is more than the current size, a push
  * operation is permitted. Otherwise, the operation is treated as an OOM.
@@ -235,7 +232,7 @@ ev_vec_push_impl(
  * desired amount, an append operation is permitted. Otherwise, the operation 
  * is treated as an OOM.
  *
- * *NOTE* The vector's copy function is not used; this is merely a memcpy
+ * *NOTE* The type's copy function is not used; this is merely a memcpy
  * operation. If a deep copy is needed, individually pushing the elements of
  * the array is the way to go.
  *
@@ -252,26 +249,6 @@ ev_vec_append(
   ev_vec_t *v,
   void **arr,
   u64 size);
-
-/*!
- * \brief A function that copies the value at the end of a vector and removes
- * it from the vector. If a copy function was passed while initializing the 
- * vector, then this function is used. Otherwise, memcpy is used with a length 
- * of `vec_meta.elemsize`
- *
- * \param v Reference to the vector object
- * \param out A pointer to the memory block at which the popped element will be
- * copied. If NULL is passed, then the element is destructed. Otherwise, the
- * element is copied to `out` and the receiving code is responsible for its
- * destruction.
- * 
- * \returns An error code. If the operation was successful, then `VEC_ERR_NONE` 
- * is returned.
- */
-EV_VEC_API ev_vec_error_t
-ev_vec_pop(
-  ev_vec_t *v, 
-  void *out);
 
 /*!
  * \brief A function that returns the last element in the vector.
