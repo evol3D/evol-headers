@@ -606,7 +606,7 @@ evstring_pushFmt_v(
     size_t old_len = evstring_getLength(*s);
     evstring_error_t res = evstring_setLength(s, old_len + fmt_len);
     if(res == EV_STR_ERR_NONE) {
-        int write_res = vsnprintf((*s) + old_len, fmt_len, fmt, args);
+        int write_res = vsnprintf((*s) + old_len, fmt_len+1, fmt, args);
         assert(write_res > 0);
         assert(write_res == fmt_len);
     }
