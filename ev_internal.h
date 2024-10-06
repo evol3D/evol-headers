@@ -14,9 +14,11 @@ typedef unsigned long long int u64;
 typedef float  f32;
 typedef double f64;
 
+#if !defined(__cplusplus)
 typedef _Bool bool;
 #define true 1
 #define false 0
+#endif
 
 #define i8_const(v)  (i8){v}
 #define i16_const(v) (i16){v}
