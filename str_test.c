@@ -56,5 +56,26 @@ int main()
   assert(search_results[1].offset == 26);
   assert(search_results[2].offset == 56);
 
+  { // PushFmt Bug
+    printf("PushFmt Bug");
+    evstring heap_str = evstring_new("Heap 'Hello, World!'");
+    printf("Heap String: %s, Length: %llu\n", heap_str, evstring_getLength(heap_str));
+
+    evstring_error_t res = evstring_push(&heap_str, "%.05f", 1.0f);
+    printf("Push Fmt #1: %s, New Length: %llu\n", heap_str, evstring_getLength(heap_str));
+    assert(evstring_getLength(heap_str) == 27);
+    assert(strcmp(heap_str, "Heap 'Hello, World!'1.00000") == 0);
+    assert(res == EV_STR_ERR_NONE);
+
+    /*evstring_push(&heap_str, "%.05f, %.05f, %.05f", 1.0f, 2.0f, 3.0f);*/
+    res = evstring_push(&heap_str, "Something");
+    printf("Push Fmt #2: %s, New Length: %llu\n", heap_str, evstring_getLength(heap_str));
+    assert(evstring_getLength(heap_str) == 36);
+    assert(strcmp(heap_str, "Heap 'Hello, World!'1.00000Something") == 0);
+    assert(res == EV_STR_ERR_NONE);
+
+    evstring_free(heap_str);
+  }
+
   return 0;
 }

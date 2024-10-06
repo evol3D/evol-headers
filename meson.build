@@ -32,6 +32,10 @@ headers_dep = declare_dependency(
   ]
 )
 
+# Tests
+str_test = executable('str_test', 'str_test.c', dependencies: [str_dep])
+test('evstr', str_test)
+
 if meson.version().version_compare('>= 0.54.0')
   meson.override_dependency('ev_vec', vec_dep)
   meson.override_dependency('ev_str', str_dep)
