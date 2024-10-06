@@ -78,6 +78,10 @@
 # endif
 #endif
 
+#if !defined(EV_BUILDTYPE_DEBUG) && !defined(EV_BUILDTYPE_DEBUG_OPT) && !defined(EV_BUILDTYPE_RELEASE)
+#define EV_BUILDTYPE_RELEASE 1
+#endif
+
 #ifndef EV_BUILDTYPE_DEBUG
 # define EV_BUILDTYPE_DEBUG 0
 #endif
