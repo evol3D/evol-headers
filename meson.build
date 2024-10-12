@@ -1,5 +1,5 @@
 project('evol-headers', 'c',
-  default_options : [ 'c_std=gnu17' ])
+  default_options : [ 'c_std=gnu23' ])
 
 headers_include = include_directories('.')
 
@@ -16,6 +16,8 @@ endif
 cc = meson.get_compiler('c')
 if cc.get_id() == 'msvc'
   evh_c_args += '/Zc:preprocessor'
+elif cc.get_id() == 'clang'
+  evh_c_args += '-DEV_CC_CLANG=1'
 endif
 
 # All other targets should follow the same template
@@ -33,7 +35,7 @@ headers_dep = declare_dependency(
 )
 
 # Tests
-str_test = executable('str_test', 'str_test.c', dependencies: [str_dep])
+str_test = executable('str_test', 'str_test.c', dependencies: [str_dep], c_args: evh_c_args)
 test('evstr', str_test)
 
 if meson.version().version_compare('>= 0.54.0')

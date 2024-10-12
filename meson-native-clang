@@ -1,0 +1,4 @@
+[binaries]
+c = 'clang.exe'
+c_ld = 'lld'
+cpp = 'clang++.exe'

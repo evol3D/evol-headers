@@ -82,7 +82,7 @@ typedef struct {
 #define TYPEDATA_GEN(T, ...) \
   EV_WARNING_PUSH(); \
   EV_WARNING_DISABLE_GCC("override-init"); \
-  EV_WARNING_DISABLE_CLANG("override-init"); \
+  EV_WARNING_DISABLE_CLANG("initializer-overrides"); \
   EV_UNUSED static const EvTypeData TypeData(T) = { \
     EV_DEBUG(.name = EV_STRINGIZE(T),) \
     .size = sizeof(T), \
@@ -114,6 +114,7 @@ typedef struct {
 #define __EV_DEFAULT_FN(T, ...)  .default_val = (void*)&(T){ __VA_ARGS__ },
 #define __EV_INVALID_FN(T, ...)  .invalid_val = (void*)&(T){ __VA_ARGS__ },
 
+[[maybe_unused]]
 static void nop() {}
 #define METHOD_CHECK(T, ...) (__VA_ARGS__ EV_DEBUG(?__VA_ARGS__:(assert(!EV_STRINGIZE(__VA_ARGS__)"not defined"),(T)nop)))
 

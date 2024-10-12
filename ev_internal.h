@@ -14,7 +14,7 @@ typedef unsigned long long int u64;
 typedef float  f32;
 typedef double f64;
 
-#if !defined(__cplusplus)
+#if !defined(__cplusplus) && __STDC_VERSION__ < 202311L
 typedef _Bool bool;
 #define true 1
 #define false 0
