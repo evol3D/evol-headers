@@ -201,6 +201,19 @@ ev_vec_iter_next(
   void **iter);
 
 /*!
+ * \brief A function that looks for the index of `val` in `v`
+ *
+ * \param v A pointer to the vector that is being iterated over
+ * \param val A pointer to the object that will be compared with vector elements
+ *
+ * \returns If found, index of element in vector. Otherwise, -1.
+ */
+EV_VEC_API i32
+ev_vec_find(
+    const ev_vec_t* v,
+    void* val);
+
+/*!
  * \brief A function that destroys a vector object. If the element type has a 
  * destructor function, then this function is called on every element before 
  * all reserved memory is freed.
@@ -402,6 +415,33 @@ ev_vec_init_impl(
   };
 
   return metadata + 1;
+}
+
+i32
+ev_vec_find(
+    const ev_vec_t* v,
+    void *val)
+{
+  __ev_vec_getmeta(*v)
+  if(metadata->typeData.equal_fn) {
+    for(u32 i = 0; i < metadata->length; i++) {
+      void *elem = *v + metadata->typeData.size * i;
+      if(!metadata->typeData.equal_fn(elem, val))
+      {
+        return i;
+      }
+    }
+  }
+  else {
+    for(u32 i = 0; i < metadata->length; i++) {
+      void *elem = *v + metadata->typeData.size * i;
+      if(!memcmp(elem, val, metadata->typeData.size))
+      {
+        return i;
+      }
+    }
+  }
+  return -1;
 }
 
 void
