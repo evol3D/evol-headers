@@ -426,7 +426,7 @@ ev_vec_find(
   if(metadata->typeData.equal_fn) {
     for(u32 i = 0; i < metadata->length; i++) {
       void *elem = *v + metadata->typeData.size * i;
-      if(!metadata->typeData.equal_fn(elem, val))
+      if(metadata->typeData.equal_fn(elem, val))
       {
         return i;
       }
@@ -435,7 +435,7 @@ ev_vec_find(
   else {
     for(u32 i = 0; i < metadata->length; i++) {
       void *elem = *v + metadata->typeData.size * i;
-      if(!memcmp(elem, val, metadata->typeData.size))
+      if(memcmp(elem, val, metadata->typeData.size) == 0)
       {
         return i;
       }

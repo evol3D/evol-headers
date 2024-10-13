@@ -52,7 +52,7 @@ typedef struct {
 #define DEFINE_EQUAL_FUNCTION(T,name) static inline bool EQUAL_FUNCTION(T,name)(T *self, T *other)
 // NOTE: This shouldn't be used for non-arithmetic types.
 #define DEFINE_DEFAULT_EQUAL_FUNCTION(T) \
-  DEFINE_EQUAL_FUNCTION(T,DEFAULT) { return memcmp(self, other, sizeof(T)); }
+  DEFINE_EQUAL_FUNCTION(T,DEFAULT) { return memcmp(self, other, sizeof(T)) == 0; }
 
 #define DEFINE_TOSTR_FUNCTION(T,name) static inline void TOSTR_FUNCTION(T,name)(T *self, char* out)
 #define DEFINE_DEFAULT_TOSTR_FUNCTION(T) \
