@@ -44,7 +44,6 @@
 #endif
 
 typedef char *evstring;
-TYPEDATA_GEN(evstring);
 
 typedef enum {
     EV_STR_ERR_NONE = 0,
@@ -192,6 +191,16 @@ EV_STR_API i64
 evstring_findLastChar(
     const evstring text,
     const char c);
+
+DEFINE_EQUAL_FUNCTION(evstring, Default)
+{
+  return evstring_cmp(*(evstring*)self, *(evstring*)other) == 0;
+}
+
+TYPEDATA_GEN(evstring,
+    EQUAL(Default)
+);
+
 
 #if defined(EV_STR_IMPLEMENTATION)
 
