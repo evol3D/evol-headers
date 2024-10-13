@@ -134,8 +134,7 @@ ev_vec_init_impl(
       }) {                                                    \
         .meta.length = len,                                   \
         .meta.capacity = len,                                 \
-        .meta.typeData.size = sizeof(T),                      \
-        .meta.typeData.alignment = EV_ALIGNOF(T),             \
+        .meta.typeData = TypeData(T),                         \
         .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
         .data = __VA_ARGS__                                   \
       }).data
@@ -147,8 +146,7 @@ ev_vec_init_impl(
       }) {                                                    \
         .meta.length = 0,                                     \
         .meta.capacity = cap,                                 \
-        .meta.typeData.size = sizeof(T),                      \
-        .meta.typeData.alignment = EV_ALIGNOF(T),             \
+        .meta.typeData = TypeData(T),                         \
         .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
         .data = __EV_VEC_EMPTY_ARRAY                          \
       }).data
@@ -424,20 +422,18 @@ ev_vec_find(
 {
   __ev_vec_getmeta(*v)
   if(metadata->typeData.equal_fn) {
-    for(u32 i = 0; i < metadata->length; i++) {
-      void *elem = *v + metadata->typeData.size * i;
+    for (void *elem = ev_vec_iter_begin(v); elem != ev_vec_iter_end(v); ev_vec_iter_next(v, &elem)) {
       if(metadata->typeData.equal_fn(elem, val))
       {
-        return i;
+        return (elem - *v) / metadata->typeData.size;
       }
     }
   }
   else {
-    for(u32 i = 0; i < metadata->length; i++) {
-      void *elem = *v + metadata->typeData.size * i;
+    for (void *elem = ev_vec_iter_begin(v); elem != ev_vec_iter_end(v); ev_vec_iter_next(v, &elem)) {
       if(memcmp(elem, val, metadata->typeData.size) == 0)
       {
-        return i;
+        return (elem - *v) / metadata->typeData.size;
       }
     }
   }
