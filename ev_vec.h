@@ -45,6 +45,14 @@ typedef enum {
 } ev_vec_error_t;
 TYPEDATA_GEN(ev_vec_error_t, DEFAULT(EV_VEC_ERR_NONE));
 
+typedef struct {
+  ev_copy_fn copy;
+  ev_equal_fn equal;
+  ev_free_fn free;
+  ev_tostr_fn tostr;
+} ev_vec_overrides_t;
+TYPEDATA_GEN(ev_vec_overrides_t);
+
 #if defined(EV_VEC_SHORTNAMES)
 # define vec_t  ev_vec_t
 # define svec_t ev_svec_t
@@ -113,7 +121,8 @@ struct ev_vec_meta_t {
  */
 EV_VEC_API ev_vec_t
 ev_vec_init_impl(
-  EvTypeData typeData);
+  EvTypeData typeData,
+  ev_vec_overrides_t overrides);
 
 /*!
  * \brief Syntactic sugar for `ev_vec_init_impl()`
@@ -122,7 +131,7 @@ ev_vec_init_impl(
  * ev_vec_init(i32);                   // ev_vec_init_impl(TypeData(i32));
  * ```
  */
-#define ev_vec_init(T) ev_vec_init_impl(TypeData(T))
+#define ev_vec_init(T, ...) ev_vec_init_impl(TypeData(T), EV_DEFAULT(ev_vec_overrides_t,__VA_ARGS__))
 
 #define ev_svec_init(T, ...) __ev_svec_init_impl(T, EV_ARRSIZE((T[])__VA_ARGS__), __VA_ARGS__)
 #define ev_svec_init_w_cap(T, cap) __ev_svec_init_w_cap_impl(T, cap)
@@ -418,11 +427,21 @@ TYPEDATA_GEN(
 
 ev_vec_t
 ev_vec_init_impl(
-  EvTypeData typeData)
+  EvTypeData typeData,
+  ev_vec_overrides_t overrides)
 {
   void *v = malloc(sizeof(struct ev_vec_meta_t) + (EV_VEC_INIT_CAP * typeData.size));
   if (!v)
     return NULL;
+
+  if(overrides.copy)
+    typeData.copy_fn = overrides.copy;
+  if(overrides.equal)
+    typeData.equal_fn = overrides.equal;
+  if(overrides.free)
+    typeData.free_fn = overrides.free;
+  if(overrides.tostr)
+    typeData.tostr_fn = overrides.tostr;
 
   struct ev_vec_meta_t *metadata = (struct ev_vec_meta_t *)v;
   *metadata = (struct ev_vec_meta_t){
