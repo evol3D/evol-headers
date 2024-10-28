@@ -275,6 +275,26 @@ ev_vec_append(
   u64 size);
 
 /*!
+ * \brief A function that copies the value at the end of a vector and removes
+ * it from the vector. If a copy function was passed while initializing the 
+ * vector, then this function is used. Otherwise, memcpy is used with a length 
+ * of `vec_meta.elemsize`
+ *
+ * \param v Reference to the vector object
+ * \param out A pointer to the memory block at which the popped element will be
+ * copied. If NULL is passed, then the element is destructed. Otherwise, the
+ * element is copied to `out` and the receiving code is responsible for its
+ * destruction.
+ * 
+ * \returns An error code. If the operation was successful, then `VEC_ERR_NONE` 
+ * is returned.
+ */
+EV_VEC_API ev_vec_error_t
+ev_vec_pop(
+    ev_vec_t *v, 
+    void *out);
+
+/*!
  * \brief A function that returns the last element in the vector.
  *
  * \param v A pointer to the vector object
