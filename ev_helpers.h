@@ -27,7 +27,7 @@ evstring
 evstring_readFile(
   evstring filePath)
 {
-  FILE* f = fopen(filePath, "r");
+  FILE* f = fopen(filePath, "rb");
   if(f == NULL) return EV_INVALID(evstring);
 
   fseek(f, 0, SEEK_END);
