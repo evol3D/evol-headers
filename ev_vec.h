@@ -65,6 +65,7 @@ TYPEDATA_GEN(ev_vec_overrides_t);
 # define vec_init        ev_vec_init
 # define svec_init       ev_svec_init
 # define svec_init_w_cap ev_svec_init_w_cap
+# define svec_init_w_len ev_svec_init_w_len
 # define vec_iter_begin  ev_vec_iter_begin
 # define vec_iter_end    ev_vec_iter_end
 # define vec_iter_next   ev_vec_iter_next
@@ -133,32 +134,22 @@ ev_vec_init_impl(
  */
 #define ev_vec_init(T, ...) ev_vec_init_impl(TypeData(T), EV_DEFAULT(ev_vec_overrides_t,__VA_ARGS__))
 
-#define ev_svec_init(T, ...) __ev_svec_init_impl(T, EV_ARRSIZE((T[])__VA_ARGS__), __VA_ARGS__)
-#define ev_svec_init_w_cap(T, cap) __ev_svec_init_w_cap_impl(T, cap)
+#define ev_svec_init(T, ...) __ev_svec_init_impl(T, EV_ARRSIZE((T[])__VA_ARGS__), EV_ARRSIZE((T[])__VA_ARGS__), __VA_ARGS__)
+#define ev_svec_init_w_cap(T, cap) __ev_svec_init_impl(T, 0, cap)
+#define ev_svec_init_w_len(T, len) __ev_svec_init_impl(T, len, len)
 
-#define __ev_svec_init_impl(T, len, ...)                      \
-    (ev_svec(T))&((struct {                                   \
-      struct ev_vec_meta_t meta;                              \
-      EV_ALIGNAS(EV_ALIGNOF(T)) T data[len];                  \
-      }) {                                                    \
-        .meta.length = len,                                   \
-        .meta.capacity = len,                                 \
-        .meta.typeData = TypeData(T),                         \
-        .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
-        .data = __VA_ARGS__                                   \
-      }).data
-
-#define __ev_svec_init_w_cap_impl(T, cap)                     \
-    (ev_svec(T))&((struct {                                   \
-      struct ev_vec_meta_t meta;                              \
-      EV_ALIGNAS(EV_ALIGNOF(T)) T data[cap];                  \
-      }) {                                                    \
-        .meta.length = 0,                                     \
-        .meta.capacity = cap,                                 \
-        .meta.typeData = TypeData(T),                         \
-        .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,  \
-        .data = __EV_VEC_EMPTY_ARRAY                          \
-      }).data
+static struct ev_vec_meta_t *__svec_interm_md;
+#define __ev_svec_init_impl(T, len, cap, ...) (                                                       \
+    __svec_interm_md = (u8[sizeof(T)*cap + sizeof(struct ev_vec_meta_t)]){},                          \
+    *__svec_interm_md = (struct ev_vec_meta_t){                                                       \
+      .length = len,                                                                                  \
+      .capacity = cap,                                                                                \
+      .typeData = TypeData(T),                                                                        \
+      .allocationType = EV_VEC_ALLOCATION_TYPE_STACK,                                                 \
+    },                                                                                                \
+    EV_VA_OPT(__VA_ARGS__)(memcpy(&__svec_interm_md[1], (T[])__VA_ARGS__, sizeof((T[])__VA_ARGS__)),) \
+    &(__svec_interm_md[1])                                                                            \
+  )
 
 /*!
  * \brief Syntactic sugar for `ev_vec_push_impl()` that allows multiple pushed in the same statement.
@@ -395,14 +386,28 @@ EV_VEC_API ev_vec_error_t
 ev_vec_grow(
   ev_vec_t *v);
 
+static const ev_vec_t EV_VEC_EMPTY = 
+  (ev_vec(i32))&((struct {
+    struct ev_vec_meta_t meta;
+    EV_ALIGNAS(EV_ALIGNOF(i32)) i32 data[0];
+    }) {
+      .meta.length = 0,
+      .meta.capacity = 0,
+      .meta.typeData = TypeData(i32),
+      .meta.allocationType = EV_VEC_ALLOCATION_TYPE_STACK,
+      .data = __EV_VEC_EMPTY_ARRAY
+    }).data;
+
 TYPEDATA_GEN(
     ev_vec_t,
-    INVALID(ev_svec_init_w_cap(i32, 0))
+    INVALID(EV_VEC_EMPTY)
 );
+
 TYPEDATA_GEN(
     ev_svec_t,
-    INVALID(ev_svec_init_w_cap(i32, 0))
+    INVALID(EV_VEC_EMPTY)
 );
+
 
 #ifdef EV_VEC_IMPLEMENTATION
 #undef EV_VEC_IMPLEMENTATION
