@@ -104,6 +104,7 @@
  * \brief Macro to get the size of a compile-time array.
  */
 #define EV_ARRSIZE(...) (sizeof(__VA_ARGS__)/sizeof((__VA_ARGS__)[0]))
+#define EV_ARRSIZE_LITERAL(...) EV_EXPAND(EV_DEFER(EV_VA_ARGS_NARG)(EV_FILTER_EMPTY(__VA_ARGS__)))
 
 /*!
  * \brief Macro to concatenate two tokens together.
@@ -225,5 +226,8 @@
  * \brief Macro to get a the hex value of a 4-number as a character
  */
 #define EV_TOHEX_CHAR(c) (("0123456789abcdef")[c])
+
+#define __EV_FILTER_EMPTY_OP(x) EV_VA_OPT_ELSE(x)(,x)()
+#define EV_FILTER_EMPTY(x,...) x EV_FOREACH(__EV_FILTER_EMPTY_OP, __VA_ARGS__)
 
 #endif // EV_HEADERS_MACROS_H
