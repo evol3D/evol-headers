@@ -27,8 +27,8 @@ evstring
 evstring_readFile(
   evstring filePath)
 {
-  FILE* f = fopen(filePath, "rb");
-  if(f == NULL) return EV_INVALID(evstring);
+  FILE* f = NULL;
+  if(fopen_s(&f,filePath,"rb")) return EV_INVALID(evstring);
 
   fseek(f, 0, SEEK_END);
   u32 buflen = ftell(f);

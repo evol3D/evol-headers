@@ -99,8 +99,12 @@ TYPEDATA_GEN(ev_vec_overrides_t);
  */
 #define ev_svec(T) T*
 
+#define EV_VEC_MAGIC (0x65765F7665635F74)
+
 //! Metadata that is stored with a vector. Unique to each vector.
 struct ev_vec_meta_t {
+  u64 _magic;
+
   //! The number of elements in the vector.
   u64 length;
   //! The maximum length of the vector before it needs to be resized.
@@ -140,15 +144,19 @@ ev_vec_init_impl(
 
 static struct ev_vec_meta_t *__svec_interm_md;
 #define __ev_svec_init_impl(T, len, cap, ...) (                                                       \
-    __svec_interm_md = (u8[sizeof(T)*cap + sizeof(struct ev_vec_meta_t)]){},                          \
+    EV_WARNING_PUSH()                                                                                 \
+    EV_WARNING_DISABLE_CLANG("unsequenced")                                                           \
+    __svec_interm_md = (void*)(u8[sizeof(T)*cap + sizeof(struct ev_vec_meta_t)]){},                   \
     *__svec_interm_md = (struct ev_vec_meta_t){                                                       \
+      ._magic = EV_VEC_MAGIC,                                                                         \
       .length = len,                                                                                  \
       .capacity = cap,                                                                                \
       .typeData = TypeData(T),                                                                        \
       .allocationType = EV_VEC_ALLOCATION_TYPE_STACK,                                                 \
     },                                                                                                \
     EV_VA_OPT(__VA_ARGS__)(memcpy(&__svec_interm_md[1], (T[])__VA_ARGS__, sizeof((T[])__VA_ARGS__)),) \
-    &(__svec_interm_md[1])                                                                            \
+    (void*)&(__svec_interm_md[1])                                                                     \
+    EV_WARNING_POP()                                                                                  \
   )
 
 /*!
@@ -169,46 +177,46 @@ static struct ev_vec_meta_t *__svec_interm_md;
 #define __ev_vec_internal_push(v, var) ev_vec_push_impl((ev_vec_t*)v, var);
 
 /*!
- * \param v A pointer to the vector that we want an iterator for
+ * \param vec_p A pointer to the vector that we want an iterator for
  *
  * \returns A pointer to the first element in a vector
  */
 EV_VEC_API void *
 ev_vec_iter_begin(
-  const ev_vec_t* v);
+  const void* vec_p);
 
 /*!
- * \param v A pointer to the vector that we want an iterator for
+ * \param vec_p A pointer to the vector that we want an iterator for
  *
  * \returns A pointer to the memory block right after the last element in the vector
  */
 EV_VEC_API void *
 ev_vec_iter_end(
-  const ev_vec_t* v);
+  const void* vec_p);
 
 /*!
  * \brief A function that increments an iterator to make it point to the next
  * element in the vector
  *
- * \param v A pointer to the vector that is being iterated over
+ * \param vec_p A pointer to the vector that is being iterated over
  * \param iter Reference to the iterator that is being incremented
  */
 EV_VEC_API void
 ev_vec_iter_next(
-  const ev_vec_t* v, 
+  const void* vec_p, 
   void **iter);
 
 /*!
  * \brief A function that looks for the index of `val` in `v`
  *
- * \param v A pointer to the vector that is being iterated over
+ * \param vec_p A pointer to the vector that is being iterated over
  * \param val A pointer to the object that will be compared with vector elements
  *
  * \returns If found, index of element in vector. Otherwise, -1.
  */
 EV_VEC_API i32
 ev_vec_find(
-    const ev_vec_t* v,
+    const void* vec_p,
     void* val);
 
 /*!
@@ -219,11 +227,11 @@ ev_vec_find(
  * *Note*: For stack-allocated vectors (`svec`), destructors are called for 
  * elements but no memory is freed.
  *
- * \param v A pointer to the vector that is being destroyed
+ * \param vec_p A pointer to the vector that is being destroyed
  */
 EV_VEC_API void
 ev_vec_fini(
-  ev_vec_t* v);
+  void* vec_p);
 
 /*!
  * \brief A function that copies a value to the end of a vector. If the element
@@ -235,7 +243,7 @@ ev_vec_fini(
  * For `svec`, as long as the capacity is more than the current size, a push
  * operation is permitted. Otherwise, the operation is treated as an OOM.
  *
- * \param v Reference to the vector object
+ * \param vec_p Reference to the vector object
  * \param val A pointer to the element that is to be copied to the end of the
  * vector
  *
@@ -244,7 +252,7 @@ ev_vec_fini(
  */
 EV_VEC_API int
 ev_vec_push_impl(
-  ev_vec_t *v,
+  void* vec_p,
   void *val);
 
 /*!
@@ -260,7 +268,7 @@ ev_vec_push_impl(
  * operation. If a deep copy is needed, individually pushing the elements of
  * the array is the way to go.
  *
- * \param v Reference to the vector object
+ * \param vec_p Reference to the vector object
  * \param arr A pointer to the array that is to be copied to the end of the
  * vector
  * \param size Number of elements in the array
@@ -270,7 +278,7 @@ ev_vec_push_impl(
  */
 EV_VEC_API u32
 ev_vec_append(
-  ev_vec_t *v,
+  void* vec_p,
   void **arr,
   u64 size);
 
@@ -280,7 +288,7 @@ ev_vec_append(
  * vector, then this function is used. Otherwise, memcpy is used with a length 
  * of `vec_meta.elemsize`
  *
- * \param v Reference to the vector object
+ * \param vec_p Reference to the vector object
  * \param out A pointer to the memory block at which the popped element will be
  * copied. If NULL is passed, then the element is destructed. Otherwise, the
  * element is copied to `out` and the receiving code is responsible for its
@@ -291,54 +299,54 @@ ev_vec_append(
  */
 EV_VEC_API ev_vec_error_t
 ev_vec_pop(
-    ev_vec_t *v, 
+    void* vec_p, 
     void *out);
 
 /*!
  * \brief A function that returns the last element in the vector.
  *
- * \param v A pointer to the vector object
+ * \param vec_p A pointer to the vector object
  * 
  * \returns Pointer to the last element in the vector. NULL if the vector is
  * empty.
  */
 EV_VEC_API void *
 ev_vec_last(
-    const ev_vec_t* v);
+    const void* v);
 
 /*!
  * \brief A function that returns the length of a vector
  *
- * \param v A pointer to the vector object
+ * \param vec_p A pointer to the vector object
  *
  * \returns Current length of the vector
  */
 EV_VEC_API u64
 ev_vec_len(
-  const ev_vec_t* v);
+  void* vec_p);
 
 /*!
  * \brief A function that returns the capacity of a vector
  *
- * \param v A pointer to the vector object
+ * \param vec_p A pointer to the vector object
  *
  * \returns Current capacity of the vector
  */
 EV_VEC_API u64
 ev_vec_capacity(
-  const ev_vec_t* v);
+  const void* vec_p);
 
 /*!
  * \brief Calls the free operation (if exists) on every element, then sets
  * the length to 0.
  *
- * \param v A pointer to the vector object
+ * \param vec_p A pointer to the vector object
  *
  * \returns 0 on success
  */
 EV_VEC_API u32
 ev_vec_clear(
-  const ev_vec_t* v);
+  const void* vec_p);
 
 /*!
  * \brief Sets the length of the vector to `len`.
@@ -350,20 +358,20 @@ ev_vec_clear(
  * For `svec`, if the `len` is more than the already allocated capacity, it is
  * treated as an OOM.
  *
- * \param v Reference to the vector object
+ * \param vec_p Reference to the vector object
  * \param len The desired new length
  *
  * \returns `VEC_ERR_NONE` on success
  */
 EV_VEC_API ev_vec_error_t
 ev_vec_setlen(
-  ev_vec_t *v, 
+  void* vec_p, 
   u64 len);
 
 /*!
  * \brief Sets the capacity of the vector to `cap`.
  *
- * \param v Reference to the vector object
+ * \param vec_p Reference to the vector object
  * \param cap The desired new capacity
  *
  * For stack-allocated vectors, `VEC_ERR_OOM` is returned
@@ -372,25 +380,26 @@ ev_vec_setlen(
  */
 EV_VEC_API ev_vec_error_t
 ev_vec_setcapacity(
-  ev_vec_t *v, 
+  void* vec_p, 
   u64 cap);
 
 /*!
  * \brief Grows the vector's capacity by a factor of `VEC_GROWTH_RATE`
  *
- * \param Reference to the vector object
+ * \param vec_p Reference to the vector object
  *
  * \returns `VEC_ERR_NONE` on success
  */
 EV_VEC_API ev_vec_error_t
 ev_vec_grow(
-  ev_vec_t *v);
+  void* vec_p);
 
 static const ev_vec_t EV_VEC_EMPTY = 
   (ev_vec(i32))&((struct {
     struct ev_vec_meta_t meta;
     EV_ALIGNAS(EV_ALIGNOF(i32)) i32 data[0];
     }) {
+      .meta._magic = EV_VEC_MAGIC,
       .meta.length = 0,
       .meta.capacity = 0,
       .meta.typeData = TypeData(i32),
@@ -412,6 +421,7 @@ TYPEDATA_GEN(
 #ifdef EV_VEC_IMPLEMENTATION
 #undef EV_VEC_IMPLEMENTATION
 
+
 #ifdef EV_VEC_API_CHECK
 #define EV_VEC_CHECK(x) do { x; } while (0)
 #else
@@ -425,7 +435,8 @@ TYPEDATA_GEN(
   ((struct ev_vec_meta_t *)v) - 1
 
 #define __ev_vec_getmeta(v) \
-  struct ev_vec_meta_t *metadata = ((struct ev_vec_meta_t *)(v)) - 1;
+  struct ev_vec_meta_t *metadata = ((struct ev_vec_meta_t *)(v)) - 1; \
+  assert(metadata->_magic == EV_VEC_MAGIC);
 
 #define __ev_vec_syncmeta(v) \
   metadata = ((struct ev_vec_meta_t *)(v)) - 1;
@@ -450,6 +461,7 @@ ev_vec_init_impl(
 
   struct ev_vec_meta_t *metadata = (struct ev_vec_meta_t *)v;
   *metadata = (struct ev_vec_meta_t){
+    ._magic = EV_VEC_MAGIC,
     .length   = 0,
     .capacity = EV_VEC_INIT_CAP,
     .allocationType = EV_VEC_ALLOCATION_TYPE_HEAP,
@@ -461,9 +473,10 @@ ev_vec_init_impl(
 
 i32
 ev_vec_find(
-    const ev_vec_t* v,
+    const void* vec_p,
     void *val)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   if(metadata->typeData.equal_fn) {
     for (void *elem = ev_vec_iter_begin(v); elem != ev_vec_iter_end(v); ev_vec_iter_next(v, &elem)) {
@@ -486,8 +499,9 @@ ev_vec_find(
 
 void
 ev_vec_fini(
-    ev_vec_t* v)
+    void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if (metadata->typeData.free_fn) {
@@ -505,9 +519,10 @@ ev_vec_fini(
 
 int
 ev_vec_push_impl(
-    ev_vec_t *v,
+    void* vec_p,
     void *val)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if (metadata->length == metadata->capacity) {
@@ -531,15 +546,16 @@ ev_vec_push_impl(
 
 void *
 ev_vec_iter_begin(
-    const ev_vec_t* v)
+    const void* vec_p)
 {
-  return *v;
+  return *(void**)vec_p;
 }
 
 void *
 ev_vec_iter_end(
-    const ev_vec_t* v)
+    const void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   return ((char *)*v) + (metadata->typeData.size * metadata->length);
@@ -547,19 +563,21 @@ ev_vec_iter_end(
 
 void
 ev_vec_iter_next(
-    const ev_vec_t* v,
+    const void* vec_p,
     void **iter)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   *iter = ((char*)*iter) + metadata->typeData.size;
 }
 
 EV_VEC_API u32
 ev_vec_append(
-  ev_vec_t *v,
+  void* vec_p,
   void **arr,
   u64 size)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   size_t old_len = metadata->length;
   size_t req_len = old_len + size;
@@ -578,9 +596,10 @@ ev_vec_append(
 
 ev_vec_error_t
 ev_vec_pop(
-    ev_vec_t *v, 
+    void* vec_p, 
     void *out)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if(out != NULL) {
@@ -604,8 +623,9 @@ ev_vec_pop(
 
 void *
 ev_vec_last(
-    const ev_vec_t* v)
+    const void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if(metadata->length == 0) {
@@ -617,24 +637,27 @@ ev_vec_last(
 
 u64
 ev_vec_len(
-    const ev_vec_t* v)
+    void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   return metadata->length;
 }
 
 u64
 ev_vec_capacity(
-    const ev_vec_t* v)
+    const void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   return metadata->capacity;
 }
 
 u32
 ev_vec_clear(
-    const ev_vec_t* v)
+    const void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if (metadata->typeData.free_fn) {
@@ -650,9 +673,10 @@ ev_vec_clear(
 
 ev_vec_error_t
 ev_vec_setlen(
-    ev_vec_t *v, 
+    void* vec_p, 
     u64 len)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   while(len > metadata->capacity) {
@@ -669,9 +693,10 @@ ev_vec_setlen(
 
 ev_vec_error_t
 ev_vec_setcapacity(
-    ev_vec_t *v, 
+    void* vec_p, 
     u64 cap)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
 
   if(metadata->allocationType == EV_VEC_ALLOCATION_TYPE_STACK) {
@@ -701,8 +726,9 @@ ev_vec_setcapacity(
 
 ev_vec_error_t
 ev_vec_grow(
-    ev_vec_t *v)
+    void* vec_p)
 {
+  ev_vec_t* v = (ev_vec_t*)vec_p;
   __ev_vec_getmeta(*v)
   return ev_vec_setcapacity(v, metadata->capacity * EV_VEC_GROWTH_RATE);
 }
