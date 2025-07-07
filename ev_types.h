@@ -30,12 +30,12 @@ typedef struct {
   void *invalid_val;
 } EvTypeData;
 
-#define COPY_FUNCTION(T,name)     EV_CATN(EV_COPY_FUNCTION_,T,_,name)
-#define FREE_FUNCTION(T,name)     EV_CATN(EV_FREE_FUNCTION_,T,_,name)
-#define HASH_FUNCTION(T,name)     EV_CATN(EV_HASH_FUNCTION_,T,_,name)
-#define EQUAL_FUNCTION(T,name)    EV_CATN(EV_EQUAL_FUNCTION_,T,_,name)
-#define TOSTR_FUNCTION(T,name)    EV_CATN(EV_TOSTR_FUNCTION_,T,_,name)
-#define TOSTRLEN_FUNCTION(T,name) EV_CATN(EV_TOSTRLEN_FUNCTION_,T,_,name)
+#define COPY_FUNCTION(T    ,name) EV_CAT(EV_CAT(EV_CAT(EV_COPY_FUNCTION_    ,T),_),name)
+#define FREE_FUNCTION(T    ,name) EV_CAT(EV_CAT(EV_CAT(EV_FREE_FUNCTION_    ,T),_),name)
+#define HASH_FUNCTION(T    ,name) EV_CAT(EV_CAT(EV_CAT(EV_HASH_FUNCTION_    ,T),_),name)
+#define EQUAL_FUNCTION(T   ,name) EV_CAT(EV_CAT(EV_CAT(EV_EQUAL_FUNCTION_   ,T),_),name)
+#define TOSTR_FUNCTION(T   ,name) EV_CAT(EV_CAT(EV_CAT(EV_TOSTR_FUNCTION_   ,T),_),name)
+#define TOSTRLEN_FUNCTION(T,name) EV_CAT(EV_CAT(EV_CAT(EV_TOSTRLEN_FUNCTION_,T),_),name)
 
 #define DEFINE_COPY_FUNCTION(T,name) static inline void COPY_FUNCTION(T,name)(T *dst, T *src)
 #define DEFINE_DEFAULT_COPY_FUNCTION(T) \
@@ -94,7 +94,7 @@ typedef struct {
   EV_WARNING_POP(); \
   EV_UNUSED static T EV_OVERRIDE_VAR(T)
 
-#define __EV_STRUCT_METHOD_DEF(T, ...) EV_CATN(__EV_,EV_HEAD __VA_ARGS__,_FN)(T, EV_TAIL __VA_ARGS__)
+#define __EV_STRUCT_METHOD_DEF(T, ...) EV_CAT(EV_CAT(__EV_,EV_HEAD __VA_ARGS__),_FN)(T, EV_TAIL __VA_ARGS__)
 
 #define COPY(...)     (COPY     , __VA_ARGS__)
 #define FREE(...)     (FREE     , __VA_ARGS__)
