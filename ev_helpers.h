@@ -23,12 +23,17 @@ evstring_readFile(
 #ifdef EV_HELPERS_IMPLEMENTATION
 #undef EV_HELPERS_IMPLEMENTATION
 
+
 evstring
 evstring_readFile(
   evstring filePath)
 {
   FILE* f = NULL;
+#if EV_OS_WINDOWS
   if(fopen_s(&f,filePath,"rb")) return EV_INVALID(evstring);
+#else
+  f = fopen(filePath, "rb");
+#endif
 
   fseek(f, 0, SEEK_END);
   u32 buflen = ftell(f);

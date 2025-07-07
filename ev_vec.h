@@ -6,6 +6,10 @@
 #include "ev_types.h"
 #include "ev_numeric.h"
 
+#if !EV_OS_WINDOWS
+#include <string.h>
+#endif
+
 #if defined(EV_VEC_SHARED)
 # if defined (EV_VEC_IMPL)
 #  define EV_VEC_API EV_EXPORT

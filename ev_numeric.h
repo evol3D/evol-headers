@@ -97,4 +97,15 @@ static const struct Float64Data Float64 =
   .EPS     =  2.2204460492503131e-016
 };
 
+#if !EV_OS_WINDOWS
+#define max(a,b) \
+  ({ __typeof__(a) _a = (a); \
+     __typeof__(b) _b = (b); \
+     _a > _b ? _a : _b; })
+#define min(a,b) \
+  ({ __typeof__(a) _a = (a); \
+     __typeof__(b) _b = (b); \
+     _a < _b ? _a : _b; })
+#endif
+
 #endif // EV_HEADERS_NUMERIC_H
