@@ -287,6 +287,17 @@ ev_vec_append(
   u64 size);
 
 /*!
+ * \brief A function that duplicates the passed vector into a new one and returns it.
+ *
+ * \param vec_p Reference to the vector object
+ *
+ * \returns The newly created vector.
+ */
+EV_VEC_API ev_vec_t
+ev_vec_dup(
+    const void* vec_p);
+
+/*!
  * \brief A function that copies the value at the end of a vector and removes
  * it from the vector. If a copy function was passed while initializing the 
  * vector, then this function is used. Otherwise, memcpy is used with a length 
@@ -596,6 +607,29 @@ ev_vec_append(
   memcpy(dst, *arr, metadata->typeData.size * size);
 
   return (int)old_len;
+}
+
+EV_VEC_API ev_vec_t
+ev_vec_dup(
+    const void* vec_p)
+{
+  ev_vec_t v_orig = *(ev_vec_t*)vec_p;
+  __ev_vec_getmeta(v_orig)
+  ev_vec_t v_new = ev_vec_init_impl(metadata->typeData, (ev_vec_overrides_t){0});
+  ev_vec_setcapacity(&v_new, metadata->length);
+
+  if(metadata->typeData.copy_fn)
+  {
+    for(int i = 0; i < metadata->length; i++)
+      ev_vec_push_impl(&v_new, (u8*)v_orig + (metadata->typeData.size * i));
+  }
+  else
+  {
+    ev_vec_setlen(&v_new, metadata->length);
+    memcpy(v_new, v_orig, metadata->length * metadata->typeData.size);
+  }
+
+  return v_new;
 }
 
 ev_vec_error_t
