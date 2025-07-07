@@ -197,8 +197,20 @@ DEFINE_EQUAL_FUNCTION(evstring, Default)
   return evstring_cmp(*(evstring*)self, *(evstring*)other) == 0;
 }
 
+DEFINE_COPY_FUNCTION(evstring, Default)
+{
+  *(evstring*)dst = evstring_newFromStr(*src);
+}
+
+DEFINE_FREE_FUNCTION(evstring, Default)
+{
+  evstring_free(*self);
+}
+
 TYPEDATA_GEN(evstring,
-    EQUAL(Default)
+    EQUAL(Default),
+    COPY(Default),
+    FREE(Default)
 );
 
 
